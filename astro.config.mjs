@@ -5,6 +5,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro'
 import * as dotenv from 'dotenv';
+import vercel from '@astrojs/vercel';
 
 // enable only when simulating https locally
 //import mkcert from 'vite-plugin-mkcert';
@@ -95,7 +96,7 @@ export default defineConfig({
 	site,
 	integrations: [mdx(), sitemap(), AstroPWA(pwaConfig)],
   output: 'server',
-  adapter: node({ mode: 'standalone' }),
+  adapter: vercel(),
   server: { port },
   // vite: {
   //   plugins: [mkcert()],

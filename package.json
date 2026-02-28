@@ -17,6 +17,7 @@
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/node": "^9.2.2",
     "@astrojs/sitemap": "^3.4.1",
+    "@astrojs/vercel": "^9.0.4",
     "@lit/task": "^1.0.2",
     "@stripe/stripe-js": "^7.6.1",
     "@supabase/supabase-js": "^2.49.10",
