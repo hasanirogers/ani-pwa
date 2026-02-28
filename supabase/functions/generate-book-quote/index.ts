@@ -62,14 +62,14 @@ Deno.serve(async (req) => {
     // 4. Book Logic: Check if book exists, if not create it
     let bookId;
     const { data: existingBook } = await supabase
-      .from('books')
+      .from('Books')
       .select('id')
       .eq('identifier', aiContent.google_book_id)
       .maybeSingle();
 
     if (!existingBook) {
       const { data: newBook, error: createError } = await supabase
-        .from('books')
+        .from('Books')
         .insert({
           title: aiContent.title,
           identifier: aiContent.google_book_id,
