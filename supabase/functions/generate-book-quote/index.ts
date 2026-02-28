@@ -27,18 +27,28 @@ Deno.serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
     const prompt = `Share a real quote from a book with a black author with a small note on what the quote means. Return ONLY a JSON object with this exact structure: {"title": "...", "author": "...", "quote": "...", "note": "...", "google_book_id": "..."}`
 
-    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: "application/json" // Forces strict JSON output
-        }
+        generationConfig: { response_mime_type: "application/json" }
       })
     });
 
-    const aiData = await aiResponse.json();
+    const aiData = await aiRes.json();
+
+    // DEBUG: This will show up in your Supabase Logs
+    console.log("Full AI Response:", JSON.stringify(aiData));
+
+    // Check if candidates exists before accessing [0]
+    if (!aiData.candidates || aiData.candidates.length === 0) {
+      // Check if it was blocked by safety
+      const reason = aiData.promptFeedback?.blockReason || "Unknown Refusal";
+      return new Response(JSON.stringify({ error: `AI Refusal: ${reason}`, raw: aiData }), { status: 500 });
+    }
+
+    // Access safely now
     const aiContent = JSON.parse(aiData.candidates[0].content.parts[0].text);
 
     // 4. Book Logic: Check if book exists, if not create it
