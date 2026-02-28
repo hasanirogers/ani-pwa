@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     // 3. Get a quote via GEMINI API (JSON Mode)
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const MODEL_NAME = 'gemini-2.5-flash'; // Or 'gemini-flash-latest'
-    const prompt = `Share a real and random quote from a random book, with a black author, with a small note on what the quote means. Only share quotes from books with a google volume id that is valid. Randomize as much as possible. Return ONLY a JSON object with this exact structure: {"title": "...", "author": "...", "quote": "...", "note": "...", "google_volume_id": "..."}`
+    const prompt = `Share a real and random quote from a random book, with a black author, with a small note on what the quote means. Do not reuse quotes that have already been shared. Return ONLY a JSON object with this exact structure: {"title": "...", "author": "...", "quote": "...", "note": "..."}`
 
     const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -59,12 +59,25 @@ Deno.serve(async (req) => {
     // Access safely now
     const aiContent = JSON.parse(aiData.candidates[0].content.parts[0].text);
 
-    // 4. Book Logic: Check if book exists, if not create it
+    const searchTitle = encodeURIComponent(aiContent.title);
+    const searchAuthor = encodeURIComponent(aiContent.author);
+    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes?q=intitle:${searchTitle}+inauthor:${searchAuthor}&maxResults=1`;
+
+    const bookRes = await fetch(googleBooksUrl);
+    const bookData = await bookRes.json();
+    const googleBookId = bookData.items && bookData.items.length > 0 ? bookData.items[0].id : null;
+
+    if (!googleBookId) {
+      throw new Error("Google Books API could not verify this book.");
+    }
+
+
+    // 4. Book Logic: Check if book exists in Ani, if not create it
     let bookId;
     const { data: existingBook } = await supabase
       .from('Books')
       .select('id')
-      .eq('identifier', aiContent.google_book_id)
+      .eq('identifier', googleBookId)
       .maybeSingle();
 
     if (!existingBook) {
@@ -72,7 +85,7 @@ Deno.serve(async (req) => {
         .from('Books')
         .insert({
           title: aiContent.title,
-          identifier: aiContent.google_book_id,
+          identifier: googleBookId,
           authors: [aiContent.author]
         })
         .select('id')
