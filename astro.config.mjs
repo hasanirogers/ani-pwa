@@ -5,7 +5,6 @@ import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro'
 import * as dotenv from 'dotenv';
 import vercel from '@astrojs/vercel';
-
 // enable only when simulating https locally
 // import mkcert from 'vite-plugin-mkcert';
 
@@ -18,6 +17,10 @@ switch (process.env.PUBLIC_ANI_ENV) {
   case 'production':
     port = 4321;
     site = "https://anibookquotes.com";
+    break;
+  case 'preview':
+    port = 4321;
+    site = `https://${process.env.VERCEL_URL}`;
     break;
   default:
     port = 4321;
@@ -85,6 +88,13 @@ const pwaConfig = {
   }
 };
 
+// const viteConfig = {
+//   plugins: [mkcert()],
+//   server: {
+//     https: true,
+//   }
+// };
+
 // https://astro.build/config
 export default defineConfig({
 	site,
@@ -92,10 +102,5 @@ export default defineConfig({
   output: 'server',
   adapter: vercel(),
   server: { port },
-  // vite: {
-  //   plugins: [mkcert()],
-  //   server: {
-  //     https: true,
-  //   }
-  // }
+  // vite: viteConfig
 });
