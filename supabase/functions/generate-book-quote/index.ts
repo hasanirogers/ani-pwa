@@ -1,79 +1,61 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
-  // 1. Initialize Supabase with Service Role to bypass RLS
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
   try {
-    // 2. Randomly select a profile marked as 'is_bot'
+    // 1. Get Bot
     const { data: bot, error: botError } = await supabase
-      .from('Profiles')
+      .from('Profiles') // Double check if this should be 'profiles'
       .select('id, username')
       .eq('is_bot', true)
       .limit(1)
       .maybeSingle()
 
     if (botError || !bot) {
-      return new Response(JSON.stringify({ error: "No bot users found in 'Profiles' table." }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" }
-      });
+      return new Response(JSON.stringify({ error: "No bot users found." }), { status: 404 });
     }
 
-    // 3. Get a quote via GEMINI API (JSON Mode)
+    // 2. AI Generation
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-    const MODEL_NAME = 'gemini-2.5-flash'; // Or 'gemini-flash-latest'
-    const prompt = `Share a real and random quote from a random book, with a black author, with a small note on what the quote means. Do not reuse quotes that have already been shared. Return ONLY a JSON object with this exact structure: {"title": "...", "author": "...", "quote": "...", "note": "..."}`
+    const MODEL_NAME = 'gemini-2.5-flash';
+    const prompt = `Share a real and random quote from a book by a black author. Provide a small note on its meaning. Be as random as possible.Return ONLY JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}`;
 
     const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: "application/json"
-        }
+        generationConfig: { response_mime_type: "application/json" }
       })
     });
 
     const aiData = await aiRes.json();
+    if (aiData.error) throw new Error(`Gemini Error: ${aiData.error.message}`);
 
-    // Check for the 404 or other API errors
-    if (aiData.error) {
-      throw new Error(`Gemini API Error (${aiData.error.code}): ${aiData.error.message}`);
-    }
-
-    // DEBUG: This will show up in your Supabase Logs
-    console.log("Full AI Response:", JSON.stringify(aiData));
-
-    // Check if candidates exists before accessing [0]
-    if (!aiData.candidates || aiData.candidates.length === 0) {
-      // Check if it was blocked by safety
-      const reason = aiData.promptFeedback?.blockReason || "Unknown Refusal";
-      return new Response(JSON.stringify({ error: `AI Refusal: ${reason}`, raw: aiData }), { status: 500 });
-    }
-
-    // Access safely now
     const aiContent = JSON.parse(aiData.candidates[0].content.parts[0].text);
 
-    const searchTitle = encodeURIComponent(aiContent.title);
-    const searchAuthor = encodeURIComponent(aiContent.author);
-    const googleBooksUrl = `https://www.googleapis.com/books/v1/volumes?q=intitle:${searchTitle}+inauthor:${searchAuthor}&maxResults=1`;
+    // 3. Google Books Verification
+    const BOOKS_API_KEY = Deno.env.get('BOOKS_API_KEY');
+    const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(aiContent.title)}+inauthor:${encodeURIComponent(aiContent.author)}&key=${BOOKS_API_KEY}`;
 
-    const bookRes = await fetch(googleBooksUrl);
+    const bookRes = await fetch(searchUrl);
     const bookData = await bookRes.json();
-    const googleBookId = bookData.items && bookData.items.length > 0 ? bookData.items[0].id : null;
+
+    // Extract ID safely
+    const googleBookId = bookData.items?.[0]?.id;
 
     if (!googleBookId) {
-      throw new Error(`Google Books API Error: Could not verify book ${bookData}`);
+      // Logic: If Google Books fails, we don't want to crash. We fallback to a custom identifier.
+      console.warn(`Could not verify ${aiContent.title} on Google Books.`);
+      throw new Error(`Verification failed for: ${aiContent.title}`);
     }
 
-
-    // 4. Book Logic: Check if book exists in Ani, if not create it
-    let bookId;
+    // 4. Find or Create Book
+    let bookDbId;
     const { data: existingBook } = await supabase
       .from('Books')
       .select('id')
@@ -86,21 +68,21 @@ Deno.serve(async (req) => {
         .insert({
           title: aiContent.title,
           identifier: googleBookId,
-          authors: [aiContent.author]
+          authors: [aiContent.author] // Ensure your DB column is type text[]
         })
         .select('id')
         .single();
 
       if (createError) throw createError;
-      bookId = newBook.id;
+      bookDbId = newBook.id;
     } else {
-      bookId = existingBook.id;
+      bookDbId = existingBook.id;
     }
 
-    // 5. Final Step: Insert the Quote
+    // 5. Insert Quote
     const { error: quoteError } = await supabase.from('Quotes').insert({
       user_id: bot.id,
-      book_id: bookId,
+      book_id: bookDbId,
       quote: aiContent.quote,
       note: aiContent.note,
       likes: [],
@@ -109,16 +91,10 @@ Deno.serve(async (req) => {
 
     if (quoteError) throw quoteError;
 
-    return new Response(JSON.stringify({ message: "Success", book: aiContent.title }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({ success: true, book: aiContent.title }), { status: 200 });
 
   } catch (err) {
     console.error("Function Error:", err.message);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 })
