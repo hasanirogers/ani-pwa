@@ -10,14 +10,14 @@ import '../ani-share-contents/share-contents';
 export const signInModalTemplate = html`
   <section>
     ${svgLogo}
-    <p>Want to join in on the fun? Login now!</p>
+    <p>Want to like, comment, and repost quotes? Login now! It's super simple and you'll get access to more features such as seeing quotes that you've liked.</p>
     <kemet-button
       variant="rounded"
       link="/login"
       @click=${() => {
         modalsStore.setState({ signInOpened: false });
       }}>
-      Login
+      Login or Sign Up
     </kemet-button>
   </section>
 `;

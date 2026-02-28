@@ -13,8 +13,9 @@ export default css`
     justify-content: center;
   }
 
-  h2 {
+  form h2 {
     text-align: center;
+    margin-bottom: 0;
   }
 
   span {

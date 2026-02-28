@@ -7,6 +7,7 @@ export default css`
 
 kemet-modal {
   --kemet-modal-dialog-background-color: var(--app-background-color);
+  --kemet-modal-dialog-max-width: 480px;
   text-align: center;
 }
 

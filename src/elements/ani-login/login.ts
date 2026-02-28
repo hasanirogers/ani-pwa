@@ -45,7 +45,8 @@ export default class AniLogin extends LitElement {
         ${this.success ? html`<div class="success"><kemet-icon icon="check-lg" size="72"></kemet-icon><h2>Check your email for a magic link to login.</h2></div>` : null}
         <hr />
         <form method="post" action="api/auth/login" @submit=${(event: SubmitEvent) => this.handleLogin(event)}>
-          <h2>Login</h2>
+          <h2>Login or Sign Up</h2>
+          <p>To login in simply enter your email and click the magic link button. You'll get a login link in your email. Check your spam folder if you don't see it. You can also login with Facebook or Google. If you've never logged in before we'll automatically create an account for you.</p>
           <kemet-field label="Enter your email to continue">
             <kemet-input required slot="input" name="identifier" ?disabled=${this.disabled} rounded validate-on-blur></kemet-input>
           </kemet-field>
