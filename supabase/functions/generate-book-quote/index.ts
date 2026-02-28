@@ -90,6 +90,8 @@ Deno.serve(async (req) => {
       book_id: bookId,
       quote: aiContent.quote,
       note: aiContent.note,
+      likes: [],
+      requotes: []
     });
 
     if (quoteError) throw quoteError;
