@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     const googleBookId = bookData.items && bookData.items.length > 0 ? bookData.items[0].id : null;
 
     if (!googleBookId) {
-      throw new Error("Google Books API could not verify this book.");
+      throw new Error(`Google Books API Error: Could not verify book ${bookData}`);
     }
 
 
