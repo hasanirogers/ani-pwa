@@ -73,7 +73,6 @@ export default css`
     .google {
       color: white;
       background-color: #131314;
-      border: 1px solid #7c7e7d;
     }
   }
 `;
