@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     if (!googleBookId) {
       // Logic: If Google Books fails, we don't want to crash. We fallback to a custom identifier.
       console.warn(`Could not verify ${aiContent.title} on Google Books.`);
-      throw new Error(`Verification failed for: ${aiContent.title}`);
+      throw new Error(`Verification failed for: ${aiContent.title}. Data: ${JSON.stringify(bookData)}`);
     }
 
     // 4. Find or Create Book
