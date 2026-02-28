@@ -5,7 +5,7 @@ import { marked } from 'marked';
 import { html } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-const RUNTIME_ENVIRONMENT = import.meta.env.PUBLIC_RUNTIME_ENVIRONMENT;
+const ANI_ENV = import.meta.env.PUBLIC_ANI_ENV;
 
 export const emitEvent = (element: HTMLElement, name: string, detail = {}, bubbles = true, composed = true) => {
   element.dispatchEvent(
@@ -17,9 +17,9 @@ export const isObjectEmpty = <T extends object>(obj: T): boolean => {
   return Object.entries(obj).length === 0;
 }
 
-export const isLocalhost = RUNTIME_ENVIRONMENT === 'local';
-export const isDevelopment = RUNTIME_ENVIRONMENT === 'development';
-export const isProduction = RUNTIME_ENVIRONMENT === 'production';
+export const isLocal = ANI_ENV === 'local';
+export const isPreview = ANI_ENV === 'preview';
+export const isProduction = ANI_ENV === 'production';
 
 export const throttle = <T extends (...args: any[]) => void>(
   func: T,
@@ -55,9 +55,7 @@ export const throttle = <T extends (...args: any[]) => void>(
 
 const _stripe: Stripe | null = null;
 export const getStripe = () => {
-  const test_key = import.meta.env.STRIPE_SECRET_KEY_TEST;
-  const live_key = import.meta.env.STRIPE_SECRET_KEY_LIVE;
-  const mode = isProduction ? live_key : test_key;
+  const mode = import.meta.env.STRIPE_SECRET_KEY;
 
   if (!_stripe) {
     return new Stripe(mode as string);

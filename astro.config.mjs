@@ -1,6 +1,5 @@
 /** @type {import('@vite-pwa/astro').PWAOptions} */
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro'
@@ -8,31 +7,26 @@ import * as dotenv from 'dotenv';
 import vercel from '@astrojs/vercel';
 
 // enable only when simulating https locally
-//import mkcert from 'vite-plugin-mkcert';
+// import mkcert from 'vite-plugin-mkcert';
 
 dotenv.config();
-
 
 let site;
 let port;
 
-switch (process.env.PUBLIC_RUNTIME_ENVIRONMENT) {
-  case 'development':
-    port = 4323;
-    site = "https://dev.anibookquotes.com";
-    break;
+switch (process.env.PUBLIC_ANI_ENV) {
   case 'production':
-    port = 4324;
+    port = 4321;
     site = "https://anibookquotes.com";
     break;
   default:
-    port = 4322;
+    port = 4321;
     site = `http://localhost:${port}`;
 }
 
 
 const pwaConfig = {
-  mode: process.env.PUBLIC_RUNTIME_ENVIRONMENT === 'production' ? 'production' : 'development',
+  mode: process.env.PUBLIC_ANI_ENV === 'production' ? 'production' : 'development',
   base: '/',
   scope: '/',
   registerType: 'autoUpdate',

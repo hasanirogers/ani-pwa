@@ -1,9 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
-const isProduction = import.meta.env.PUBLIC_RUNTIME_ENVIRONMENT === 'production';
-const projectID = isProduction ? "ywdityiebxhhjfmspwwk" : "empjkbtwrtuaitcrxxsa";
-const anonKey = isProduction ? import.meta.env.SUPABASE_ANON_KEY : import.meta.env.SUPABASE_ANON_KEY_DEV;
-const serviceRoleKey = isProduction ? import.meta.env.SUPABASE_SERVICE_ROLE_KEY : import.meta.env.SUPABASE_SERVICE_ROLE_KEY_DEV;
+const projectID = import.meta.env.SUPABASE_PROJECT_ID;
+const anonKey = import.meta.env.SUPABASE_ANON_KEY;
+const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const supabase = createClient(`https://${projectID}.supabase.co`, anonKey);
 export const supabaseAdmin = createClient(`https://${projectID}.supabase.co`, serviceRoleKey);
