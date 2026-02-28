@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     // 3. Get a quote via GEMINI API (JSON Mode)
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const MODEL_NAME = 'gemini-2.5-flash'; // Or 'gemini-flash-latest'
-    const prompt = `Share a real and random quote from a random book, with a black author, with a small note on what the quote means. Only share quotes from books with a google book id that is valid. Randomize as much as possible. Return ONLY a JSON object with this exact structure: {"title": "...", "author": "...", "quote": "...", "note": "...", "google_book_id": "..."}`
+    const prompt = `Share a real and random quote from a random book, with a black author, with a small note on what the quote means. Only share quotes from books with a google volume id that is valid. Randomize as much as possible. Return ONLY a JSON object with this exact structure: {"title": "...", "author": "...", "quote": "...", "note": "...", "google_volume_id": "..."}`
 
     const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
