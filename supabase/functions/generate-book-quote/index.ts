@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
     // 2. AI Generation
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const MODEL_NAME = 'gemini-2.5-flash';
-    const prompt = `Share a real and random quote from a book by a black author. Provide a small note on its meaning. Be as random as possible.Return ONLY JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}`;
+    const prompt = `Share a real and random quote from a book. Provide a small note on its meaning. Be as random as possible. Return ONLY JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}`;
 
     const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
