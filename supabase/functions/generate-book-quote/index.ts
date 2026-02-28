@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
 
   // Randomly select a profile marked as 'is_bot'
   const { data: bot } = await supabase
-    .from('profiles')
+    .from('Profiles')
     .select('id, username')
     .eq('is_bot', true)
     .limit(1)
