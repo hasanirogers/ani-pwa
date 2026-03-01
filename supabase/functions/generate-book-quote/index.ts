@@ -19,10 +19,45 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "No bot users found." }), { status: 404 });
     }
 
+    // 1b. Fetch the titles of the last 10 quotes FROM BOT USERS ONLY
+    const { data: recentQuotes, error: fetchError } = await supabase
+      .from('Quotes')
+      .select(`
+        quote,
+        Profiles!inner(id, is_bot),
+        Books(title)
+      `)
+      .eq('Profiles.is_bot', true) // Filter at the profile level
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (fetchError) {
+      console.error("Error fetching bot memory:", fetchError.message);
+    }
+
+    // Map the titles into a string Gemini can understand
+    const blacklist = recentQuotes
+      ?.map(q => `"${q.Books?.title || 'Unknown'}"`)
+      .filter((title, index, self) => self.indexOf(title) === index) // Unique titles only
+      .join(', ') || "None yet";
+
     // 2. AI Generation
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const MODEL_NAME = 'gemini-2.5-flash';
-    const prompt = `Share a real and random quote from a book. Provide a small note on its meaning. Be as random as possible. Return ONLY JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}`;
+
+    const prompt = `
+      You are an expert literary bot. Your task is to provide a real quote from a book by a black author.
+
+      CONTEXT (Do not repeat these recently posted books):
+      ${blacklist}
+
+      INSTRUCTIONS:
+      1. Pick a book NOT in the list above.
+      2. Provide the quote and a brief note of insight.
+      3. Return ONLY valid JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}
+    `;
+
+    // const prompt = `Share a real and random quote from a book. Provide a small note on its meaning. Be as random as possible. Return ONLY JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}`;
 
     const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
