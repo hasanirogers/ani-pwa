@@ -94,3 +94,7 @@ export const truncateString = (str: string, count: number): string => {
   return (lastSpace > 0 ? sub.slice(0, lastSpace) : sub).trim() + '...';
 };
 
+
+export const determineAvatar = (publicURL: string, avatar: string, avatarUrl: string) => {
+  return avatar ? `${publicURL}${avatar}` : avatarUrl || null;
+};

@@ -46,7 +46,7 @@ export default class AniUserView extends LitElement {
 
   render() {
     const user = this.user ? JSON.parse(this.user) : null;
-    const displayName = this.user ? user.username ?? user.email : null;
+    const displayName = this.user ? user.display_name ?? user.email : null;
 
     return html`
       <hr />

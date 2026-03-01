@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
 import { supabase } from "../../../shared/database";
+import { determineAvatar } from "../../../shared/utilities";
 
 export const prerender = false;
 
@@ -20,7 +21,7 @@ export const GET: APIRoute = async ({ params }) => {
         likes,
         requotes,
         book:Books (id, title, identifier, authors),
-        user:Profiles (id, username, email, avatar)
+        user:Profiles (id, display_name, email, avatar, avatar_url)
       `)
       .eq('id', id)
       .single();
@@ -35,7 +36,8 @@ export const GET: APIRoute = async ({ params }) => {
         ...quote,
         user: {
           ...quote.user,
-          avatar: `${publicUrl}/${quote.user.avatar}`
+          // avatar: `${publicUrl}/${quote.user.avatar}`
+          avatar: determineAvatar(publicUrl, quote.user.avatar, quote.user.avatar_url)
         }
       };
 
@@ -50,6 +52,7 @@ export const GET: APIRoute = async ({ params }) => {
       { status: 400 }
     );
   } catch(error) {
+    console.error(error);
     return new Response(
       JSON.stringify({ success: false, message: "An internal server error occurred." }),
       { status: 500 })

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
 import { supabase } from "../../../shared/database";
+import { determineAvatar } from "../../../shared/utilities";
 
 export const prerender = false;
 
@@ -16,7 +17,7 @@ export const GET: APIRoute = async ({ params }) => {
       comment,
       quote_id,
       profile_id,
-      user:Profiles (id, username, email, avatar)
+      user:Profiles (id, display_name, email, avatar, avatar_url)
     `)
     .eq('quote_id', quote_id);
 
@@ -30,7 +31,8 @@ export const GET: APIRoute = async ({ params }) => {
         ...comment,
         user: {
           ...comment.user,
-          avatar: !!comment.user.avatar ? `${avatarBaseURL}/${comment.user.avatar}` : null
+          // avatar: !!comment.user.avatar ? `${avatarBaseURL}/${comment.user.avatar}` : null,
+          avatar: determineAvatar(avatarBaseURL, comment.user.avatar, comment.user.avatar_url)
         }
       }
     });

@@ -42,8 +42,8 @@ export default class AniQuote extends LitElement {
   render() {
     if (!this.quote || !this.quote.user) return null;
 
-    const displayName = this.quote.user.username ?? this.quote.user.email;
-    const displayNameOriginal = this.isRequote && this.originalQuote ? this.originalQuote.user.username ?? this.originalQuote.user.email : '';
+    const displayName = this.quote.user.display_name ?? this.quote.user.email;
+    const displayNameOriginal = this.isRequote && this.originalQuote ? this.originalQuote.user.display_name ?? this.originalQuote.user.email : '';
 
     return html`
       ${this.quote.user.id === this.userState.profile?.id

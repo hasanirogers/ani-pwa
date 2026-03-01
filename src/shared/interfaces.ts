@@ -68,7 +68,7 @@ export interface IUser {
 export interface IProfile {
   id: number;
   uuid: string;
-  username: string;
+  display_name: string;
   email: string;
   provider: string;
   confirmed: boolean;
@@ -84,6 +84,7 @@ export interface IProfile {
   books?: IBook[];
   counts?: { quotes: number, followers: number, following: number };
   avatar: string;
+  avatar_url: string;
   member_id?: string;
   member_free_pass?: boolean;
 }

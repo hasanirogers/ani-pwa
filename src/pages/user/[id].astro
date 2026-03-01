@@ -6,7 +6,7 @@ const origin = url.origin;
 const userId = Astro.params.id;
 const userDetails = await fetch(`${origin}/api/users/details/${userId}`).then(response => response.json());
 const user = userDetails.id ? JSON.stringify(userDetails) : null;
-const pageTitle = userDetails.id ? `${userDetails.username ?? userDetails.email} | Ani Book Quotes` : null;
+const pageTitle = userDetails.id ? `${userDetails.display_name ?? userDetails.email} | Ani Book Quotes` : null;
 const bio = userDetails.id ? userDetails.bio : null;
 ---
 
