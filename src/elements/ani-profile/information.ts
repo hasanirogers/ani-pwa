@@ -108,6 +108,11 @@ export default class AniInformation extends LitElement {
                   </kemet-field>
                 </p>
                 <p>
+                  <kemet-field label="Avatar URL" slug="avatar_url">
+                    <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
+                  </kemet-field>
+                </p>
+                <p>
                   <kemet-field label="Bio" slug="bio">
                     <kemet-textarea slot="input" name="bio" rounded filled value=${this.userState?.profile?.bio}></kemet-textarea>
                     <kemet-count slot="component" message="characters remaining." limit="1000" validate-immediately></kemet-count>

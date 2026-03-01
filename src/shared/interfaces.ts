@@ -84,6 +84,7 @@ export interface IProfile {
   books?: IBook[];
   counts?: { quotes: number, followers: number, following: number };
   avatar: string;
+  avatar_url: string;
   member_id?: string;
   member_free_pass?: boolean;
 }

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
 import { supabase } from "../../../shared/database";
+import { determineAvatar } from "../../../shared/utilities";
 
 export const prerender = false;
 
@@ -36,7 +37,7 @@ export const GET: APIRoute = async ({ request }) => {
       .select(`
         *,
         book:Books(id, title, identifier, authors),
-        user:Profiles(id, display_name, email, avatar)
+        user:Profiles(id, display_name, email, avatar, avatar_url)
       `)
       .limit(pageSize)
       .range(from, to)
@@ -60,7 +61,7 @@ export const GET: APIRoute = async ({ request }) => {
           ...quote,
           user: {
             ...quote.user,
-            avatar: !!quote.user.avatar ? `${publicUrl}/${quote.user.avatar}` : null
+            avatar: determineAvatar(publicUrl, quote.user.avatar, quote.user.avatar_url)
           }
         }
       });
