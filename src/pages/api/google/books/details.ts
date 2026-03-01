@@ -9,7 +9,6 @@ export const GET: APIRoute = async ({ request }) => {
     const identifier = url.searchParams.get('identifier');
     const bookDetails = await fetch(`https://www.googleapis.com/books/v1/volumes/${identifier}?key=${process.env.BOOKS_API_KEY}`).then(response => response.json());
 
-
     if (!bookDetails) {
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get book details" }),

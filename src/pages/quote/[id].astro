@@ -6,7 +6,7 @@ const origin = url.origin;
 const quoteId = Astro.params.id;
 const quoteDetails = await fetch(`${origin}/api/quotes/${quoteId}`).then(response => response.json());
 const quote = quoteDetails.id ? JSON.stringify(quoteDetails) : null;
-const pageTitle = quoteDetails.id ? `${quoteDetails.book.title} | A quote by ${quoteDetails.user.username ?? quoteDetails.user.email}` : null;
+const pageTitle = quoteDetails.id ? `${quoteDetails.book.title} | A quote by ${quoteDetails.book.authors[0]}` : null;
 ---
 
 <Layout

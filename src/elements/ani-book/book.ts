@@ -93,7 +93,11 @@ export default class aniBook extends LitElement {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title: this.book.volumeInfo.title, identifier: this.book.id })
+        body: JSON.stringify({
+          title: this.book.volumeInfo.title,
+          identifier: this.book.id,
+          authors: this.book.volumeInfo.authors
+        })
       };
       const createResponse = await fetch(`/api/books/create`, createOptions).then(response => response.json());
       book = createResponse.data;

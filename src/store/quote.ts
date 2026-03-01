@@ -13,6 +13,9 @@ export interface IQuoteStore {
   comments: IComment[],
   addComment: (comment: IComment) => void,
   addInitialComments: (comments: IComment[]) => void,
+
+  currentQuote: IQuote | null,
+  setCurrentQuote: (quote: IQuote | null) => void,
 }
 
 const store = createStore<IQuoteStore>(set => ({
@@ -25,6 +28,8 @@ const store = createStore<IQuoteStore>(set => ({
   comments: [],
   addComment: (comment: IComment) => set(state => { return { comments: [...state.comments, comment] } }),
   addInitialComments: (comments: IComment[]) => set(() => { return { comments } }),
+  currentQuote: null,
+  setCurrentQuote: (quote: IQuote | null) => set(() => { return { currentQuote: quote } }),
 }));
 
 export default store;

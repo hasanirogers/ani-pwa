@@ -5,8 +5,6 @@ import { supabase } from "../../../shared/database";
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
-  const url = new URL(request.url);
-  const origin = url.origin;
   const body = await request.json();
   const { accessToken, refreshToken } = body;
 

@@ -4,16 +4,13 @@ import { loadStripe } from '@stripe/stripe-js';
 import userStore, { type IUserStore } from '../../store/user';
 import alertStore, { type IAlertStore } from '../../store/alert';
 import appStore, { type IAppStore } from '../../store/app';
-import { isProduction } from '../../shared/utilities';
 
 import styles from './styles';
 import sharedStyles from '../../shared/styles';
 
 
-const STRIPE_PUBLIC_KEY_LIVE = import.meta.env.PUBLIC_STRIPE_KEY_LIVE;
-const STRIPE_PUBLIC_KEY_TEST = import.meta.env.PUBLIC_STRIPE_KEY_TEST;
-
-const stripe = await loadStripe(isProduction ? `${STRIPE_PUBLIC_KEY_LIVE}` : `${STRIPE_PUBLIC_KEY_TEST}`);
+const STRIPE_PUBLIC_KEY = import.meta.env.PUBLIC_STRIPE_KEY;
+const stripe = await loadStripe(STRIPE_PUBLIC_KEY);
 @customElement('ani-membership')
 export class AniMembership extends LitElement {
   static styles = [sharedStyles, styles];

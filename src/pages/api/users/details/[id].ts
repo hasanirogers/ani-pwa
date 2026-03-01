@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
 import { supabase } from "../../../../shared/database";
+import { determineAvatar } from "../../../../shared/utilities";
 
 export const prerender = false;
 
@@ -72,7 +73,8 @@ export const GET: APIRoute = async ({ params }) => {
       ...profile,
       books,
       counts: { quotes: quotesCount, followers: followerCount, following: profile.following?.length || 0 },
-      avatar: profile.avatar ? publicUrl : null
+      // avatar: profile.avatar ? publicUrl : null
+      avatar: determineAvatar(publicUrl, profile.avatar, profile.avatar_url)
     };
 
     return new Response(

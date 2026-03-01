@@ -71,7 +71,7 @@ export default class AniInformation extends LitElement {
   }
 
   render() {
-    const displayName = this.userState?.profile?.username ?? this.userState?.profile?.email;
+    const displayName = this.userState?.profile?.display_name ?? this.userState?.profile?.email;
     return html`
       <kemet-card>
         <form @submit=${(event: SubmitEvent) => this.updateProfile(event)}>
@@ -103,8 +103,13 @@ export default class AniInformation extends LitElement {
                   </kemet-field>
                 </p>
                 <p>
-                  <kemet-field label="Username" slug="username">
-                    <kemet-input slot="input" name="username" rounded filled value=${this.userState?.profile?.username}></kemet-input>
+                  <kemet-field label="Display Name" slug="display_name">
+                    <kemet-input slot="input" name="display_name" rounded filled value=${this.userState?.profile?.display_name}></kemet-input>
+                  </kemet-field>
+                </p>
+                <p>
+                  <kemet-field label="Avatar URL" slug="avatar_url">
+                    <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
                   </kemet-field>
                 </p>
                 <p>

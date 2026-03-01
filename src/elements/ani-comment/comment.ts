@@ -24,7 +24,7 @@ export default class AniComment extends LitElement {
   userState: IUserStore = userStore.getInitialState();
 
   render() {
-    const displayName = this.comment.user.username ?? this.comment.user.email;
+    const displayName = this.comment.user.display_name ?? this.comment.user.email;
     return this.comment && this.comment.user ? html`
       ${this.comment.user.id === this.userState.profile?.id
         ? html`<button aria-label="Delete"><kemet-icon icon="x-lg" size="16" @click=${() => this.deleteComment()}></kemet-icon></button>`

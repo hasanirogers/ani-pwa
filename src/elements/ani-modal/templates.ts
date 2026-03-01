@@ -5,18 +5,19 @@ import modalsStore from "../../store/modals";
 import '../ani-post-comment/post-comment';
 import '../ani-new-quote/new-quote';
 import '../ani-delete-user/delete-user';
+import '../ani-share-contents/share-contents';
 
 export const signInModalTemplate = html`
   <section>
     ${svgLogo}
-    <p>Want to join in on the fun? Login now!</p>
+    <p>Want to like, comment, and repost quotes? Login now! It's super simple and you'll get access to more features such as seeing quotes that you've liked.</p>
     <kemet-button
       variant="rounded"
       link="/login"
       @click=${() => {
         modalsStore.setState({ signInOpened: false });
       }}>
-      Login
+      Login or Sign Up
     </kemet-button>
   </section>
 `;
@@ -31,4 +32,8 @@ export const newQuoteModalTemplate = html`
 
 export const deleteUserModalTemplate = html`
   <ani-delete-user></ani-delete-user>
+`;
+
+export const shareModalTemplate = html`
+  <ani-share-contents></ani-share-contents>
 `;

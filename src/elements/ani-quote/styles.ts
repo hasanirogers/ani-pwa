@@ -7,6 +7,11 @@ export default css`
 
   a {
     color: inherit;
+    text-decoration: none;
+  }
+
+  cite a {
+    color: var(--app-link-color);
   }
 
   img {

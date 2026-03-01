@@ -13,6 +13,7 @@ export const POST: APIRoute = async ({ request }) => {
       .insert({
         title: body.title,
         identifier: body.identifier,
+        authors: body.authors,
       })
       .eq('identifier', body.identifier)
       .select('*')

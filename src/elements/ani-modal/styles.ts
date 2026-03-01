@@ -10,6 +10,10 @@ kemet-modal {
   text-align: center;
 }
 
+kemet-modal#modal-sign-in {
+  --kemet-modal-dialog-max-width: 480px;
+}
+
 kemet-modal p {
   color: var(--app-color);
 }

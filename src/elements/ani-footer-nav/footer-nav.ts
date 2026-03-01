@@ -30,7 +30,6 @@ export class AniFooterNav extends LitElement {
           </a>
         </div>
       </nav>
-      ${console.log('displayMode', this.displayMode)}
       ${this.displayMode === 'browser'
         ? html`
           <ul>
