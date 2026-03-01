@@ -7,13 +7,20 @@ Deno.serve(async (req) => {
   )
 
   try {
-    // 1. Get Bot
+    // 1. Get a Random Bot
+    const { count } = await supabase
+      .from('Profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_bot', true);
+
+    const randomIndex = Math.floor(Math.random() * (count || 1));
+
     const { data: bot, error: botError } = await supabase
       .from('Profiles')
       .select('id, display_name')
       .eq('is_bot', true)
-      .limit(1)
-      .maybeSingle()
+      .range(randomIndex, randomIndex)
+      .maybeSingle();
 
     if (botError || !bot) {
       return new Response(JSON.stringify({ error: "No bot users found." }), { status: 404 });
