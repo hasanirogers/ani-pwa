@@ -21,8 +21,14 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (error) {
       console.log(error);
+      let message = error.message;
+
+      if (error.code === 'over_email_send_rate_limit') {
+        message = 'Please wait 30 seconds before requesting another login link.';
+      }
+
       return new Response(
-        JSON.stringify({ success: false, message: error.message, error }),
+        JSON.stringify({ success: false, message, error }),
         { status: error.status || 500 }
       );
     }
