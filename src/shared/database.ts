@@ -5,7 +5,7 @@ const anonKey = import.meta.env.SUPABASE_ANON_KEY;
 const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
 const options = {
   auth: {
-    flowType: 'implicit' as AuthFlowType, // TODO update to pkce when ready
+    flowType: 'pkce' as AuthFlowType,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
 import { supabase } from "../../../shared/database";
+import type { AuthFlowType } from "@supabase/supabase-js";
 
 export const prerender = false;
 
@@ -15,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
       email: identifier,
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${origin}/callbacks/email`,
+        emailRedirectTo: `${origin}/callbacks/email`
       }
     });
 
