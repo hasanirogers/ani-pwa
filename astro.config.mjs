@@ -14,17 +14,13 @@ let site;
 let port;
 
 switch (process.env.PUBLIC_ANI_ENV) {
-  case 'production':
+  case 'local':
     port = 4321;
-    site = "https://anibookquotes.com";
-    break;
-  case 'preview':
-    port = 4321;
-    site = `https://${process.env.VERCEL_URL}`;
+    site = `http://localhost:${port}`;
     break;
   default:
     port = 4321;
-    site = `http://localhost:${port}`;
+    site = `https://${process.env.VERCEL_URL}`;
 }
 
 
