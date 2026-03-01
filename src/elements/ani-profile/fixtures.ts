@@ -1,7 +1,7 @@
 export const fixtureProfile = {
   "id": 1,
   "documentId": "w6ib29qyx67t6f0wcvbmry9d",
-  "username": "OgdoadPantheon",
+  "display_name": "OgdoadPantheon",
   "email": "ogdoad.pantheon@gmail.com",
   "provider": "local",
   "confirmed": true,

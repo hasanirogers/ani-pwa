@@ -68,7 +68,7 @@ export interface IUser {
 export interface IProfile {
   id: number;
   uuid: string;
-  username: string;
+  display_name: string;
   email: string;
   provider: string;
   confirmed: boolean;

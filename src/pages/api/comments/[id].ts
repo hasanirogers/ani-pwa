@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ params }) => {
       comment,
       quote_id,
       profile_id,
-      user:Profiles (id, username, email, avatar)
+      user:Profiles (id, display_name, email, avatar)
     `)
     .eq('quote_id', quote_id);
 

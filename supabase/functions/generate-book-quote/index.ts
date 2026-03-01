@@ -9,8 +9,8 @@ Deno.serve(async (req) => {
   try {
     // 1. Get Bot
     const { data: bot, error: botError } = await supabase
-      .from('Profiles') // Double check if this should be 'profiles'
-      .select('id, username')
+      .from('Profiles')
+      .select('id, display_name')
       .eq('is_bot', true)
       .limit(1)
       .maybeSingle()
@@ -46,13 +46,13 @@ Deno.serve(async (req) => {
     const MODEL_NAME = 'gemini-2.5-flash';
 
     const prompt = `
-      You are an expert literary bot. Your task is to provide a real quote from a book by a black author.
+      You are an expert literary bot. Your task is to provide a real and random quote from a book.
 
       CONTEXT (Do not repeat these recently posted books):
       ${blacklist}
 
       INSTRUCTIONS:
-      1. Pick a book NOT in the list above.
+      1. Pick a book NOT in the list above, be as random as possible.
       2. Provide the quote and a brief note of insight.
       3. Return ONLY valid JSON: {"title": "...", "author": "...", "quote": "...", "note": "..."}
     `;

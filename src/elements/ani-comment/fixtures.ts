@@ -9,7 +9,7 @@ export const fixtureCommentUser1 = {
   "user": {
       "id": 1,
       "documentId": "w6ib29qyx67t6f0wcvbmry9d",
-      "username": "OgdoadPantheon",
+      "display_name": "OgdoadPantheon",
       "email": "ogdoad.pantheon@gmail.com",
       "provider": "local",
       "confirmed": true,
@@ -71,7 +71,7 @@ export const fixtureCommentUser2 = {
   "user": {
       "id": 9,
       "documentId": "synrfxcejtwrpotrtqzl08cj",
-      "username": "temp07",
+      "display_name": "temp07",
       "email": "temp07@email.com",
       "provider": "local",
       "confirmed": true,
