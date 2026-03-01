@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
-    "@astrojs/node": "^9.2.2",
     "@astrojs/sitemap": "^3.4.1",
     "@astrojs/vercel": "^9.0.4",
     "@lit/task": "^1.0.2",
     "@stripe/stripe-js": "^7.6.1",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.49.10",
     "@types/js-cookie": "^3.0.6",
     "@vite-pwa/astro": "^1.1.0",
