@@ -13,24 +13,25 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       // Debug: Log what we're setting
       console.log('Setting cookies for production debug');
 
-      // Try different cookie settings for Vercel production
-      const isVercelProd = process.env.VERCEL_ENV === 'production';
+      // Get hostname for explicit domain setting
+      const hostname = new URL(request.url).hostname;
+      const domain = hostname.includes('vercel.app') ? `; Domain=${hostname}` : '';
 
-      cookies.set("sb:access_token", access_token, {
-        path: "/",
-        httpOnly: true,
-        secure: !process.env.DEV,
-        sameSite: "lax",
-        maxAge: 3600 // Add explicit expiry
-      });
+      // Set cookies manually in response headers for Vercel production
+      const accessTokenCookie = `sb:access_token=${access_token}; Path=/; HttpOnly; SameSite=lax; Max-Age=3600${hostname !== 'localhost' ? '; Secure' : ''}${domain}`;
+      const refreshTokenCookie = `sb:refresh_token=${refresh_token}; Path=/; HttpOnly; SameSite=lax; Max-Age=604800${hostname !== 'localhost' ? '; Secure' : ''}${domain}`;
 
-      cookies.set("sb:refresh_token", refresh_token, {
-        path: "/",
-        httpOnly: true,
-        secure: !process.env.DEV,
-        sameSite: "lax",
-        maxAge: 604800 // 7 days
-      });
+      const response = new Response(
+        JSON.stringify({ success: true, message: 'Login successful' }),
+        { status: 200 }
+      );
+
+      // Set both cookies manually
+      response.headers.set('Set-Cookie', accessTokenCookie);
+      response.headers.append('Set-Cookie', refreshTokenCookie);
+      response.headers.set('Content-Type', 'application/json');
+
+      return response;
     }
   }
 
