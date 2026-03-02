@@ -6,14 +6,22 @@ import { getStripe } from "../../../shared/utilities";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals, cookies }) => {
+  console.log('=== ME ENDPOINT DEBUG ===');
+  console.log('locals.user exists:', !!locals.user);
+  console.log('locals.user email:', locals.user?.email);
+  console.log('locals.user id:', locals.user?.id);
+
   try {
     // Check if user is available from middleware
     if (!locals.user) {
+      console.log('No user in locals, returning 401');
       return new Response(
         JSON.stringify({ success: false, message: "You are not logged in." }),
         { status: 401 }
       );
     }
+
+    console.log('User found in locals, querying database...');
 
     // Use admin client with service role key for database operations (no auth needed)
     const { data: profile, error: profileError } = await supabaseAdmin
@@ -22,24 +30,36 @@ export const GET: APIRoute = async ({ request, locals, cookies }) => {
       .eq('uuid', locals.user.id)
       .single();
 
+    console.log('Profile query result:', { profile: !!profile, error: !!profileError });
+    console.log('Profile error:', profileError);
+
+    if (profileError) {
+      console.log('Profile error details:', profileError);
+    }
+
     const { data: books, error: booksError } = await supabaseAdmin
       .from('Books')
       .select('*')
       .in('id', profile?.book_ids || []);
 
+    console.log('Books query result:', { books: books?.length || 0, error: !!booksError });
+
     if (profile && books) {
       const data = { ...profile, books };
+      console.log('Returning successful response');
       return new Response(
         JSON.stringify(data),
         { status: 200 }
       );
     }
 
+    console.log('Failed to get profile or books');
     return new Response(
       JSON.stringify({ success: false, message: "Failed to get profile.", errors: { profileError, booksError } }),
       { status: 400 }
     );
   } catch(error) {
+    console.error('ME endpoint error:', error);
     return new Response(
       JSON.stringify({ success: false, message: "An internal server error occurred." }),
       { status: 500 })
