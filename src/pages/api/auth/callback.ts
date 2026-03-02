@@ -53,6 +53,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
           JSON.stringify({ success: true, message: 'Login successful' }),
           { status: 200 }
         );
+      } else {
+        console.error('Error exchanging code for session:', error);
       }
     } catch (error) {
       console.error('Error exchanging code for session:', error);
