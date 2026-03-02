@@ -11,8 +11,18 @@
         {
           "key": "Cache-Control",
           "value": "no-store, must-revalidate"
+        },
+        {
+          "key": "Set-Cookie",
+          "value": "*"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     }
   ]
 }
