@@ -1,34 +1,33 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabase, supabaseAdmin } from "../../../shared/database";
+import { supabaseAdmin, supabaseServerClient } from "../../../shared/database";
 import { getStripe } from "../../../shared/utilities";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals, cookies }) => {
   try {
-    const {
-      data: { session },
-      error
-    } = await supabase.auth.getSession();
-
-    if (!session) {
+    // Check if user is available from middleware
+    if (!locals.user) {
       return new Response(
         JSON.stringify({ success: false, message: "You are not logged in." }),
-        { status: 400 }
+        { status: 401 }
       );
     }
+
+    // Use server-side client for database operations
+    const supabase = supabaseServerClient(cookies);
 
     const { data: profile, error: profileError } = await supabase
       .from('Profiles')
       .select('*')
-      .eq('uuid', session.user.id)
+      .eq('uuid', locals.user.id)
       .single();
 
     const { data: books, error: booksError } = await supabase
       .from('Books')
       .select('*')
-      .in('id', profile.book_ids);
+      .in('id', profile?.book_ids || []);
 
     if (profile && books) {
       const data = { ...profile, books };
@@ -49,28 +48,23 @@ export const GET: APIRoute = async ({ request }) => {
   }
 }
 
-export const DELETE: APIRoute = async ({ request }) => {
-  // const url = new URL(request.url);
-  // const origin = url.origin;
-
+export const DELETE: APIRoute = async ({ request, locals, cookies }) => {
   try {
+    // Check if user is available from middleware
+    if (!locals.user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "You are not logged in." }),
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { member_id } = body;
 
-    const {
-      data: { session },
-      error: sessionError
-    } = await supabase.auth.getSession();
+    // Use server-side client for auth operations
+    const supabase = supabaseServerClient(cookies);
 
-    if (!session) {
-      console.log(sessionError);
-      return new Response(
-        JSON.stringify({ success: false, message: "You are not logged in.", error: sessionError }),
-        { status: 401 }
-      )
-    }
-
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(session.user.id);
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(locals.user.id);
 
     if (deleteError) {
       console.log(deleteError);
@@ -85,7 +79,7 @@ export const DELETE: APIRoute = async ({ request }) => {
     const { data: files, error: listError } = await supabase
       .storage
       .from('avatars')
-      .list(`${session.user.id}`, { limit: 100 });
+      .list(`${locals.user.id}`, { limit: 100 });
 
     if (listError) {
       return new Response(JSON.stringify({ success: false, message: "Failed to list files.", error: listError }), {
@@ -94,7 +88,7 @@ export const DELETE: APIRoute = async ({ request }) => {
     }
 
     // Step 2: Construct file paths for deletion
-    const filePaths = files.map(file => `${session.user.id.toString()}/${file.name}`);
+    const filePaths = files.map((file: any) => `${locals.user!.id.toString()}/${file.name}`);
 
     // Step 3: Delete files
     if (filePaths.length > 0) {
