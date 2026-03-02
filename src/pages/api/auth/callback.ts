@@ -4,8 +4,15 @@ import { supabase } from "../../../shared/database";
 console.log('*** CALLBACK FILE LOADED ***');
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
+  console.log('=== CALLBACK REQUEST DEBUG ===');
+  console.log('Request method:', request.method);
+  console.log('Request URL:', request.url);
+  console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+
   const body = await request.json();
+  console.log('Request body:', body);
   const code = body.code;
+  console.log('Extracted code:', !!code);
 
   if (code) {
     try {
