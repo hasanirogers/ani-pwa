@@ -44,19 +44,19 @@ export const GET: APIRoute = async ({ request, locals, cookies }) => {
 
     console.log('Books query result:', { books: books?.length || 0, error: !!booksError });
 
-    if (profile && books) {
-      const data = { ...profile, books };
-      console.log('Returning successful response');
+    if (profile) {
+      const data = { ...profile, books: books || [] };
+      console.log('Returning successful response with', books?.length || 0, 'books');
       return new Response(
         JSON.stringify(data),
         { status: 200 }
       );
     }
 
-    console.log('Failed to get profile or books');
+    console.log('No profile found');
     return new Response(
-      JSON.stringify({ success: false, message: "Failed to get profile.", errors: { profileError, booksError } }),
-      { status: 400 }
+      JSON.stringify({ success: false, message: "Profile not found." }),
+      { status: 404 }
     );
   } catch(error) {
     console.error('ME endpoint error:', error);

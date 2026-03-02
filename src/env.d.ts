@@ -6,3 +6,9 @@ declare namespace App {
     user?: import("@supabase/supabase-js").User;
   }
 }
+
+declare global {
+  interface Window {
+    user?: import("../shared/interfaces").IProfile;
+  }
+}

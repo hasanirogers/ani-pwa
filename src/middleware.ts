@@ -34,5 +34,31 @@ export const onRequest = defineMiddleware(async ({ locals, url, cookies, redirec
     }
   }
 
-  return next();
+  // Inject user data into DOM for frontend store to access
+  const script = `
+    if (typeof window !== 'undefined') {
+      window.__ASTRO_USER__ = ${JSON.stringify(locals.user || null)};
+    }
+  `;
+
+  // Inject script into head
+  const response = next();
+  let responseWithHeaders: any = response;
+
+  // Type guard to check if response has expected properties
+  if (response && typeof response === 'object') {
+    responseWithHeaders = response as { headers?: any, html?: string };
+
+    if ('headers' in responseWithHeaders) {
+      responseWithHeaders.headers = responseWithHeaders.headers || {};
+      responseWithHeaders.headers.set('Content-Security-Policy', "script-src 'self' 'unsafe-inline'");
+    }
+
+    // Append script to response
+    if ('html' in responseWithHeaders) {
+      responseWithHeaders.html = (responseWithHeaders.html || '') + `<script>${script}</script>`;
+    }
+  }
+
+  return responseWithHeaders;
 });
