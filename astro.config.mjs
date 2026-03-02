@@ -4,7 +4,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro'
 import * as dotenv from 'dotenv';
-import vercel from '@astrojs/vercel';
+import vercel from '@astrojs/vercel/serverless';
 // enable only when simulating https locally
 // import mkcert from 'vite-plugin-mkcert';
 

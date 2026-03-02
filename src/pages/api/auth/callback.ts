@@ -10,14 +10,21 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     if (!error && data.session) {
       const { access_token, refresh_token } = data.session;
 
-      // Debug: Log what we're setting
-      console.log('Setting cookies for production debug');
+      // Debug: Log everything
+      console.log('=== COOKIE DEBUG ===');
+      console.log('Session data:', { hasAccessToken: !!access_token, hasRefreshToken: !!refresh_token });
 
-      // Get hostname for explicit domain setting
       const hostname = new URL(request.url).hostname;
+      console.log('Hostname:', hostname);
+
       const domain = hostname.includes('vercel.app') ? { domain: hostname } : {};
+      console.log('Domain setting:', domain);
+
+      // Log existing cookies
+      console.log('Existing cookies:', request.headers.get('Cookie'));
 
       // Use Supabase's standard cookie names with explicit domain for Vercel
+      console.log('Setting sb-access-token...');
       cookies.set("sb-access-token", access_token, {
         path: "/",
         httpOnly: true,
@@ -27,6 +34,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         ...domain
       });
 
+      console.log('Setting sb-refresh-token...');
       cookies.set("sb-refresh-token", refresh_token, {
         path: "/",
         httpOnly: true,
@@ -35,6 +43,9 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         maxAge: 604800,
         ...domain
       });
+
+      console.log('Cookies set successfully');
+      console.log('=== END DEBUG ===');
     }
   }
 
