@@ -15,16 +15,14 @@ export const GET: APIRoute = async ({ request, locals, cookies }) => {
       );
     }
 
-    // Use server-side client for database operations
-    const supabase = supabaseServerClient(cookies);
-
-    const { data: profile, error: profileError } = await supabase
+    // Use admin client with service role key for database operations (no auth needed)
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('Profiles')
       .select('*')
       .eq('uuid', locals.user.id)
       .single();
 
-    const { data: books, error: booksError } = await supabase
+    const { data: books, error: booksError } = await supabaseAdmin
       .from('Books')
       .select('*')
       .in('id', profile?.book_ids || []);
@@ -61,9 +59,7 @@ export const DELETE: APIRoute = async ({ request, locals, cookies }) => {
     const body = await request.json();
     const { member_id } = body;
 
-    // Use server-side client for auth operations
-    const supabase = supabaseServerClient(cookies);
-
+    // Use admin client for auth operations (no auth needed)
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(locals.user.id);
 
     if (deleteError) {
@@ -75,8 +71,8 @@ export const DELETE: APIRoute = async ({ request, locals, cookies }) => {
     }
 
     // Delete user's avatar files
-    // Step 1: List all files in the user's folder
-    const { data: files, error: listError } = await supabase
+    // Step 1: List all files in user's folder
+    const { data: files, error: listError } = await supabaseAdmin
       .storage
       .from('avatars')
       .list(`${locals.user.id}`, { limit: 100 });
@@ -92,7 +88,7 @@ export const DELETE: APIRoute = async ({ request, locals, cookies }) => {
 
     // Step 3: Delete files
     if (filePaths.length > 0) {
-      const { error: storageError } = await supabase
+      const { error: storageError } = await supabaseAdmin
         .storage
         .from('avatars')
         .remove(filePaths);
