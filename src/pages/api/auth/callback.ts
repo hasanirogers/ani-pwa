@@ -13,8 +13,24 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       // Debug: Log what we're setting
       console.log('Setting cookies for production debug');
 
-      cookies.set("sb:access_token", access_token, { path: "/", httpOnly: true, secure: true, sameSite: "lax" });
-      cookies.set("sb:refresh_token", refresh_token, { path: "/", httpOnly: true, secure: true, sameSite: "lax" });
+      // Try different cookie settings for Vercel production
+      const isVercelProd = process.env.VERCEL_ENV === 'production';
+
+      cookies.set("sb:access_token", access_token, {
+        path: "/",
+        httpOnly: true,
+        secure: !process.env.DEV,
+        sameSite: "lax",
+        maxAge: 3600 // Add explicit expiry
+      });
+
+      cookies.set("sb:refresh_token", refresh_token, {
+        path: "/",
+        httpOnly: true,
+        secure: !process.env.DEV,
+        sameSite: "lax",
+        maxAge: 604800 // 7 days
+      });
     }
   }
 
