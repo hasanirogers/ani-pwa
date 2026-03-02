@@ -4,7 +4,7 @@ import { defineMiddleware } from 'astro:middleware'
 export const onRequest = defineMiddleware(async ({ locals, request, cookies }, next) => {
   locals.supabase = createServerClient(
     `https://${import.meta.env.SUPABASE_PROJECT_ID}.supabase.co`,
-    import.meta.env.SUPABASE_ANON_KEY,
+    import.meta.env.SUPABASE_API_KEY_PUBLISHABLE,
     {
       cookies: {
         getAll() {
