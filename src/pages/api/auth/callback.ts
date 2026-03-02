@@ -44,16 +44,28 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
           console.log('Access token length:', access_token.length);
           console.log('Cookies object type:', typeof cookies);
 
+          const cookieName = `sb-${projectName}-auth-token`;
+          const cookieOptions = {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax" as const,
+            maxAge: 3600,
+            ...domain
+          };
+
+          console.log('Cookie name:', cookieName);
+          console.log('Cookie options:', JSON.stringify(cookieOptions, null, 2));
+          console.log('Hostname:', hostname);
+
           try {
-            cookies.set(`sb-${projectName}-auth-token`, access_token, {
-              path: "/",
-              httpOnly: true,
-              secure: true,
-              sameSite: "lax",
-              maxAge: 3600,
-              ...domain
-            });
+            cookies.set(cookieName, access_token, cookieOptions);
             console.log('Access token cookie set successfully');
+
+            // Verify it was set
+            const verifyCookie = cookies.get(cookieName)?.value;
+            console.log('Verification - cookie exists after setting:', !!verifyCookie);
+            console.log('Verification - cookie length after setting:', verifyCookie?.length || 0);
           } catch (error) {
             console.error('Error setting access token cookie:', error);
           }
