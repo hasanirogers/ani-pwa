@@ -14,28 +14,60 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       if (!error && data.session) {
         const { access_token, refresh_token } = data.session;
 
+        console.log('Session data received:', {
+          hasAccessToken: !!access_token,
+          hasRefreshToken: !!refresh_token,
+          accessTokenLength: access_token?.length || 0,
+          refreshTokenLength: refresh_token?.length || 0
+        });
+
         const hostname = new URL(request.url).hostname;
-        const domain = hostname.includes('vercel.app') ? { domain: hostname } : {};
+        let domain = {};
+
+        // For Vercel, don't set explicit domain to allow subdomain access
+        if (hostname.includes('vercel.app')) {
+          // Don't set domain - let browser handle it automatically
+        } else if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          domain = { domain: hostname };
+        }
 
         // Use Supabase's proper cookie naming convention
-        const projectName = import.meta.env.SUPABASE_PROJECT_ID;
-        cookies.set(`sb-${projectName}-auth-token`, access_token, {
-          path: "/",
-          httpOnly: true,
-          secure: true,
-          sameSite: "lax",
-          maxAge: 3600,
-          ...domain
-        });
+        const projectName = import.meta.env.SUPABASE_PROJECT_ID || 'empjkbtwrtuaitcrxxsa';
 
-        cookies.set(`sb-${projectName}-auth-token-refresh`, refresh_token, {
-          path: "/",
-          httpOnly: true,
-          secure: true,
-          sameSite: "lax",
-          maxAge: 604800,
-          ...domain
-        });
+        console.log('Setting cookies for hostname:', hostname);
+        console.log('Project ID:', import.meta.env.SUPABASE_PROJECT_ID);
+
+        // Set access token cookie
+        if (access_token) {
+          console.log('Setting access token cookie...');
+          cookies.set(`sb-${projectName}-auth-token`, access_token, {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            maxAge: 3600,
+            ...domain
+          });
+          console.log('Access token cookie set successfully');
+        } else {
+          console.error('Access token is null, not setting cookie');
+        }
+
+        // Set refresh token cookie
+        if (refresh_token) {
+          console.log('Setting refresh token cookie...');
+          cookies.set(`sb-${projectName}-auth-token-refresh`, refresh_token, {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax",
+            maxAge: 604800,
+            ...domain
+          });
+          console.log('Refresh token cookie set successfully');
+        } else {
+          console.error('Refresh token is null, not setting cookie');
+        }
 
         // Return success response
         return new Response(
