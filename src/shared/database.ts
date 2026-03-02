@@ -46,7 +46,6 @@ export const supabaseServerClient = (cookies: AstroCookies) => {
         remove: (key, options) => cookies.delete(key, options),
       },
       auth: {
-        flowType: 'pkce' as AuthFlowType,
         persistSession: false, // Don't persist session on server side
         autoRefreshToken: false, // Don't auto refresh on server side
         detectSessionInUrl: false,
