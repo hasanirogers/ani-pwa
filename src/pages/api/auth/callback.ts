@@ -9,8 +9,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.session) {
       const { access_token, refresh_token } = data.session;
-      cookies.set("sb-access-token", access_token, { path: "/", httpOnly: true, secure: true });
-      cookies.set("sb-refresh-token", refresh_token, { path: "/", httpOnly: true, secure: true });
+      cookies.set("sb-access-token", access_token, { path: "/", httpOnly: true, secure: true, sameSite: "lax" });
+      cookies.set("sb-refresh-token", refresh_token, { path: "/", httpOnly: true, secure: true, sameSite: "lax" });
     }
   }
 
