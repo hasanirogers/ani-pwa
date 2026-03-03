@@ -26,9 +26,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
         // Use Supabase's proper cookie naming convention
         const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
+        console.log('Project name:', projectName);
+        console.log('Access token exists:', !!access_token);
+        console.log('Refresh token exists:', !!refresh_token);
 
         // Set access token cookie
         if (access_token) {
+          console.log('Setting auth token cookie with name:', `sb-${projectName}-auth-token`);
           cookies.set(`sb-${projectName}-auth-token`, access_token, {
             path: "/",
             httpOnly: true,
@@ -49,6 +53,31 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
             maxAge: 604800,
             ...domain
           });
+        }
+
+        // Fetch user profile and set it in a non-httpOnly cookie for client access
+        if (access_token) {
+          try {
+            const payload = JSON.parse(atob(access_token.split('.')[1]));
+            const { data: profile, error: profileError } = await supabase
+              .from('Profiles')
+              .select('*')
+              .eq('uuid', payload.sub)
+              .single();
+
+            if (!profileError && profile) {
+              cookies.set('user-profile', JSON.stringify(profile), {
+                path: "/",
+                httpOnly: false,
+                secure: true,
+                sameSite: "lax" as const,
+                maxAge: 3600,
+                ...domain
+              });
+            }
+          } catch (profileError) {
+            console.error('Error fetching profile:', profileError);
+          }
         }
 
         // Return success response
