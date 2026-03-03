@@ -3,7 +3,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from "../components/Footer.astro";
 
 const { heading, description } = Astro.props;
-const { user } = Astro.locals;
+const { user, profile } = Astro.locals;
 ---
 
 <!doctype html>
@@ -18,8 +18,9 @@ const { user } = Astro.locals;
       </div>
     </ani-layout>
     <Footer />
-    <script define:vars={{ user }}>
+    <script define:vars={{ user, profile }}>
       window.user = user;
+      window.profile = profile;
     </script>
 	</body>
 </html>
