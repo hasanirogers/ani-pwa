@@ -16,6 +16,22 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "No bot found." }), { status: 404 });
     }
 
+    // 1b. Fetch the titles of the last 10 quotes FROM BOT USERS ONLY
+    const { data: recentQuotes, error: fetchError } = await supabase
+      .from('Quotes')
+      .select(`
+        quote,
+        Profiles!inner(id, is_bot),
+        Books(title)
+      `)
+      .eq('Profiles.is_bot', true) // Filter at the profile level
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (fetchError) {
+      console.error("Error fetching bot memory:", fetchError.message);
+    }
+
     // Map the titles into a string Gemini can understand
     const blacklist = recentQuotes
       ?.map(q => `"${q.Books?.title || 'Unknown'}"`)
