@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
   try {
     // 1. Get a Random Bot
     const { data: bot, error: botError } = await supabase
-      .rpc('get_random_bot')
+      .rpc('get_fair_bot')
       .single();
 
     if (botError || !bot) {
