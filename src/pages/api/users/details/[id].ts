@@ -96,21 +96,27 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     delete body.filepond;
 
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from('Profiles')
       .update(body)
       .eq('id', userId)
 
-    if (error) {
-      console.log(error);
+    if (updateError) {
+      console.log(updateError);
       return new Response(
-        JSON.stringify({ success: false, message: "Failed to update profile.", error }),
+        JSON.stringify({ success: false, message: "Failed to update profile.", error: updateError }),
         { status: 400 }
       );
     }
 
+    const { data } = await supabase
+      .from('Profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
     return new Response(
-      JSON.stringify({ success: true, message: "Profile updated successfully." }),
+      JSON.stringify({ success: true, message: "Profile updated successfully.", data }),
       { status: 200 }
     );
   } catch (error) {

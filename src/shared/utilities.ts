@@ -126,3 +126,19 @@ export const deleteCookie = (name: string, path: string = "/", domain?: string) 
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; SameSite=Lax; Secure`;
   }
 }
+
+export const setCookie = (
+  name: string,
+  value: any,
+  days: number = 7,
+  domain: string | null = null
+) => {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  const cookieValue = typeof value === 'object' ? JSON.stringify(value) : value;
+  let cookieString = `${name}=${encodeURIComponent(cookieValue)}; expires=${expires}; path=/; SameSite=Lax; Secure`;
+  if (domain) {
+    cookieString += `; domain=${domain}`;
+  }
+
+  document.cookie = cookieString;
+};

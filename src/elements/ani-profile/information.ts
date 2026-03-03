@@ -14,9 +14,9 @@ import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
 import FilePondPluginImageResize from 'filepond-plugin-image-resize';
 import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
+import { setCookie } from '../../shared/utilities.ts';
+import { ENUM_ALERT_STATUS } from '../../shared/enums.ts';
 
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 FilePond.registerPlugin(
   FilePondPluginFileEncode,
@@ -61,6 +61,10 @@ export default class AniInformation extends LitElement {
 
     alertStore.subscribe((state) => {
       this.alertState = state;
+    });
+
+    userStore.subscribe((state) => {
+      this.userState = state;
     });
   }
 
@@ -192,13 +196,27 @@ export default class AniInformation extends LitElement {
     };
 
     const profile = await fetch(`/api/users/details/${this.userState.profile.id}`, options)
-      .then((response) => response.json())
-      .catch((error) => console.error(error));
+      .then((response) => {
+        this.alertState.setStatus(ENUM_ALERT_STATUS.PRIMARY);
+        this.alertState.setMessage('Profile updated!');
+        this.alertState.setOpened(true);
+        this.alertState.setIcon('info-circle');
+        return response.json();
+      })
+      .catch((error) => {
+        this.alertState.setStatus(ENUM_ALERT_STATUS.ERROR);
+        this.alertState.setMessage("An error occurred while updating your profile.");
+        this.alertState.setOpened(true);
+        this.alertState.setIcon('exclamation-circle');
+        console.error(error);
+      });
 
     this.userState.updateProfile({
-      ...profile,
+      ...profile.data,
       ...Object.fromEntries(formData)
     });
+
+    setCookie('user-profile', profile.data, 7);
 
     // Upload Media
     // ---------------
