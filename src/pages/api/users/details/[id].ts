@@ -67,7 +67,7 @@ export const GET: APIRoute = async ({ params }) => {
     const { data: { publicUrl } } = supabase
       .storage
       .from('avatars')
-      .getPublicUrl(profile.avatar);
+      .getPublicUrl(profile.avatar || '');
 
     const data = {
       ...profile,
