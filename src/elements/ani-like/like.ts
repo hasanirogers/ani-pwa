@@ -28,7 +28,7 @@ export default class AniLike extends LitElement {
   firstUpdated() {
     if (this.quote) {
       this.likes = this.quote.likes.length;
-      if (this.userState.isLoggedIn) this.liked = this.quote.likes.includes(this.userState.profile.id);
+      if (this.userState.isLoggedIn && this.userState.profile) this.liked = this.quote.likes.includes(this.userState.profile.id);
     }
   }
 
@@ -51,7 +51,7 @@ export default class AniLike extends LitElement {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ liked: this.liked, likedBy: this.userState.profile.id })
+        body: JSON.stringify({ liked: this.liked, likedBy: this.userState.profile?.id })
       });
     } else {
       this.modalsState.setSignInOpened(true);
