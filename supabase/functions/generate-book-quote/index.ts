@@ -8,38 +8,12 @@ Deno.serve(async (req) => {
 
   try {
     // 1. Get a Random Bot
-    const { count } = await supabase
-      .from('Profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_bot', true);
-
-    const randomIndex = Math.floor(Math.random() * (count || 1));
-
     const { data: bot, error: botError } = await supabase
-      .from('Profiles')
-      .select('id, display_name')
-      .eq('is_bot', true)
-      .range(randomIndex, randomIndex)
-      .maybeSingle();
+      .rpc('get_random_bot')
+      .single();
 
     if (botError || !bot) {
-      return new Response(JSON.stringify({ error: "No bot users found." }), { status: 404 });
-    }
-
-    // 1b. Fetch the titles of the last 10 quotes FROM BOT USERS ONLY
-    const { data: recentQuotes, error: fetchError } = await supabase
-      .from('Quotes')
-      .select(`
-        quote,
-        Profiles!inner(id, is_bot),
-        Books(title)
-      `)
-      .eq('Profiles.is_bot', true) // Filter at the profile level
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    if (fetchError) {
-      console.error("Error fetching bot memory:", fetchError.message);
+      return new Response(JSON.stringify({ error: "No bot found." }), { status: 404 });
     }
 
     // Map the titles into a string Gemini can understand
@@ -52,8 +26,23 @@ Deno.serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
     const MODEL_NAME = 'gemini-2.5-flash';
 
+    const themes = [
+      "obscure sci-fi",
+      "19th century poetry",
+      "modern philosophy",
+      "forgotten memoirs",
+      "hardboiled noir",
+      "african philosophy",
+      "ancient egyptian history",
+      "afrofuturism",
+      "black history"
+    ];
+    const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+
     const prompt = `
       You are an expert literary bot. Your task is to provide a real and random quote from a book.
+
+      CURRENT VIBE: Focus on something related to ${randomTheme}.
 
       CONTEXT (Do not repeat these recently posted books):
       ${blacklist}
