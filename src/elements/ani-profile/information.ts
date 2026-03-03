@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
 import userStore, { type IUserStore } from '../../store/user.ts';
 import alertStore, { type IAlertStore } from '../../store/alert.ts';
@@ -74,6 +74,16 @@ export default class AniInformation extends LitElement {
     const displayName = this.userState?.profile?.display_name ?? this.userState?.profile?.email;
     return html`
       <kemet-card>
+        <nav>
+          <kemet-button variant="text" link=${`/user/${this.userState?.profile?.id}`}>View Profile</kemet-button>
+          &nbsp;|&nbsp;
+          <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
+          ${this.userState.profile?.member_id
+            ? html`&nbsp;|&nbsp;<kemet-button variant="text" @click=${() => this.handleManageMembership()}>Manage Membership</kemet-button>`
+            : html`&nbsp;|&nbsp;<kemet-button variant="text" link="/membership/checkout">Become a Member</kemet-button>`
+          }
+        </nav>
+        <hr />
         <form @submit=${(event: SubmitEvent) => this.updateProfile(event)}>
           <fieldset>
             <legend>Welcome, ${displayName}</legend>
@@ -81,16 +91,6 @@ export default class AniInformation extends LitElement {
               <br />
               <div class="profile-image">${this.makeProfileImage()}</div>
               <hr />
-              <p>
-                <kemet-button variant="text" link=${`/user/${this.userState?.profile?.id}`}>View Profile</kemet-button>
-                &nbsp;|&nbsp;
-                <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
-                ${!!this.userState.profile.member_id
-                  ? html`&nbsp;|&nbsp;<kemet-button variant="text" @click=${() => this.handleManageMembership()}>Manage Membership</kemet-button>`
-                  : html`&nbsp;|&nbsp;<kemet-button variant="text" link="/membership/checkout">Become a Member</kemet-button>`
-                }
-              </p>
-              <hr /><br />
               <div>
                 <p>
                   <kemet-field label="First Name" slug="first-name">
@@ -239,14 +239,14 @@ export default class AniInformation extends LitElement {
       }
     }
 
-    await fetch(`/api/uploads/avatars/${this.userState.profile.id}`, deleteOptions);
+    await fetch(`/api/uploads/avatars/${this.userState.profile?.id}`, deleteOptions);
   }
 
   async handleManageMembership() {
     const response = await fetch(`/api/stripe/create-portal-session`, {
       method: "POST",
       body: JSON.stringify({
-        member_id: this.userState.profile.member_id || ''
+        member_id: this.userState.profile?.member_id || ''
       })
     });
 

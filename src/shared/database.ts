@@ -2,7 +2,7 @@ import { createClient, type AuthFlowType } from "@supabase/supabase-js";
 import { createServerClient } from '@supabase/ssr';
 import type { AstroCookies } from 'astro';
 
-const projectID = import.meta.env.SUPABASE_PROJECT_ID;
+const projectID = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
 const supabaseKey = import.meta.env.SUPABASE_API_KEY_PUBLISHABLE;
 const supabaseSecret = import.meta.env.SUPABASE_API_KEY_SECRET;
 const options = {

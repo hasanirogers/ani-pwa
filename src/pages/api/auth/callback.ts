@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         }
 
         // Use Supabase's proper cookie naming convention
-        const projectName = import.meta.env.SUPABASE_PROJECT_ID || 'empjkbtwrtuaitcrxxsa';
+        const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
 
         // Set access token cookie
         if (access_token) {

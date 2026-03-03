@@ -1,6 +1,6 @@
 import { createStore } from 'zustand/vanilla';
-import appStore from '../store/app';
 import { type IProfile } from '../shared/interfaces';
+import { deleteCookie, getCookie } from '../shared/utilities';
 
 // Extend Window interface to include user property
 declare global {
@@ -29,7 +29,11 @@ const store = createStore<IUserStore>(set => ({
   updateProfile: (profile: IProfile) => set(() => ({ profile })),
   isLoggedIn: getUserFromWindow() !== null,
   logout: async () => {
-    await fetch(`/api/auth/logout`);
+    await fetch(`/api/auth/logout`, { method: 'POST' });
+    const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
+    deleteCookie(`sb-${projectName}-auth-token`);
+    deleteCookie(`sb-${projectName}-auth-token-refresh`);
+    window.user = undefined;
     window.location.href = "/";
   }
 }));

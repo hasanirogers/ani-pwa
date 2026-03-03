@@ -24,31 +24,6 @@ export class AniLoginCallback extends LitElement {
     `;
   }
 
-  // async initCallback() {
-  //   const hashParams = new URLSearchParams(window.location.hash.slice(1));
-  //   const accessToken = hashParams.get('access_token');
-  //   const refreshToken = hashParams.get('refresh_token');
-
-  //   const response = await fetch(`/api/auth/verify`, {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       accessToken,
-  //       refreshToken,
-  //     }),
-  //   });
-
-  //   const data = await response.json();
-
-  //   if (data.error) {
-  //     this.alertState.setStatus('error');
-  //     this.alertState.setMessage(data.error.message);
-  //     this.alertState.setOpened(true);
-  //     this.alertState.setIcon('exclamation-circle');
-  //   } else {
-  //     window.location.href = '/';
-  //   }
-  // }
-
   async initCallback() {
     // 1. Try to get tokens from Hash (Implicit)
     const hashParams = new URLSearchParams(window.location.hash.slice(1));

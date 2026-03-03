@@ -98,3 +98,31 @@ export const truncateString = (str: string, count: number): string => {
 export const determineAvatar = (publicURL: string, avatar: string, avatarUrl: string) => {
   return avatar ? `${publicURL}${avatar}` : avatarUrl || null;
 };
+
+export const getCookie = (name: string) => {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+            c = c.substring(1, c.length);
+        }
+        if (c.indexOf(nameEQ) === 0) {
+            // Use decodeURIComponent to handle encoded characters
+            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+    }
+    return null; // Return null if the cookie is not found
+}
+
+export const deleteCookie = (name: string, path: string = "/", domain?: string) => {
+  let cookieString = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}`;
+  if (domain) {
+    cookieString += `; domain=${domain}`;
+  }
+  cookieString += "; SameSite=Lax; Secure"; // Add SameSite and Secure attributes to match Supabase's cookie settings
+  document.cookie = cookieString;
+  if (domain) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${path}; SameSite=Lax; Secure`;
+  }
+}

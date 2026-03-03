@@ -7,6 +7,10 @@ export const informationStyles = css`
     display: block;
   }
 
+  nav {
+    text-align: center;
+  }
+
   button.image {
     width: 100%;
   }
