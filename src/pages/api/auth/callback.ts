@@ -13,15 +13,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       if (!error && data.session) {
         const { access_token, refresh_token } = data.session;
 
-        const hostname = new URL(request.url).hostname;
-        let domain = {};
+        // const hostname = new URL(request.url).hostname;
+        // let domain = {};
 
-        // For Vercel, don't set explicit domain to allow subdomain access
-        if (hostname.includes('vercel.app')) {
-          // Don't set domain - let browser handle it automatically
-        } else if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-          domain = { domain: hostname };
-        }
+        // // For Vercel, don't set explicit domain to allow subdomain access
+        // if (hostname.includes('vercel.app')) {
+        //   // Don't set domain - let browser handle it automatically
+        // } else if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+        //   domain = { domain: hostname };
+        // }
 
         // Use Supabase's proper cookie naming convention
         const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
@@ -34,7 +34,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             secure: true,
             sameSite: "lax" as const,
             maxAge: 3600,
-            ...domain
+            // ...domain
           });
         }
 
@@ -46,7 +46,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             secure: true,
             sameSite: "lax" as const,
             maxAge: 604800,
-            ...domain
+            // ...domain
           });
         }
 
@@ -67,7 +67,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
                 secure: true,
                 sameSite: "lax" as const,
                 maxAge: 3600,
-                ...domain
+                // ...domain
               });
             }
           } catch (profileError) {
