@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabase } from "../../../shared/database";
+import { supabaseAdmin } from "../../../shared/database";
 
 export const prerender = false;
 
@@ -8,7 +8,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('Books')
       .insert({
         title: body.title,
