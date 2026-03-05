@@ -6,6 +6,8 @@ export default css`
     display: block;
     width: 100%;
     height: 100%;
+    position: relative;
+    overflow: hidden;
     border-radius: var(--kemet-border-radius-lg);
     border: 1px solid var(--app-border-color);
   }
@@ -49,5 +51,33 @@ export default css`
   header,
   footer {
     padding: 0 var(--kemet-spacer-md);
+  }
+
+  section {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+
+    kemet-icon {
+      color: var(--app-success-color);
+    }
+
+    strong {
+      display: block;
+    }
+  }
+
+  :host([selected]) section {
+    display: flex;
   }
 `;

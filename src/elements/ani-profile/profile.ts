@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import userStore, { type IUserStore } from '../../store/user.ts';
+import modalsStore, { type IModalsStore } from '../../store/modals.ts';
 import sharedStyles from '../../shared/styles.ts';
 
 import './information.ts';
@@ -16,6 +17,9 @@ export default class aniProfile extends LitElement {
 
   @state()
   userState: IUserStore = userStore.getInitialState();
+
+  @state()
+  modalsState: IModalsStore = modalsStore.getInitialState();
 
   constructor() {
     super();
@@ -46,6 +50,11 @@ export default class aniProfile extends LitElement {
           <ani-library></ani-library>
         </kemet-tab-panel>
       </kemet-tabs>
+
+      <kemet-fab pill @click=${() => this.modalsState.setNewQuoteOpened(true)}>
+        <kemet-icon slot="icon" icon="pencil-square" size="24"></kemet-icon>
+        New Quote
+      </kemet-fab>
     `;
   }
 

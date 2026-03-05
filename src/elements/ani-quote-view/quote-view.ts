@@ -2,11 +2,13 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { IComment } from '../../shared/interfaces';
 import quoteStore, { type IQuoteStore } from '../../store/quote';
+import modalsStore, { type IModalsStore } from '../../store/modals';
 import styles from './styles';
 import sharedStyles from '../../shared/styles';
 
 import '../ani-quote/quote';
 import '../ani-comment/comment';
+
 
 @customElement('ani-quote-view')
 export default class AniQuoteView extends LitElement {
@@ -20,6 +22,9 @@ export default class AniQuoteView extends LitElement {
 
   @state()
   quoteState: IQuoteStore = quoteStore.getInitialState();
+
+  @state()
+  modalsState: IModalsStore = modalsStore.getInitialState();
 
   constructor() {
     super();
@@ -49,6 +54,10 @@ export default class AniQuoteView extends LitElement {
           </ani-not-found>
         `
       }
+      <kemet-fab pill @click=${() => this.modalsState.setNewQuoteOpened(true)}>
+        <kemet-icon slot="icon" icon="pencil-square" size="24"></kemet-icon>
+        New Quote
+      </kemet-fab>
     `
   }
 

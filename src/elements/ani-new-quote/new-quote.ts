@@ -51,7 +51,7 @@ export default class AniNewQuote extends LitElement {
   }
 
   render() {
-    const books = this.userState.profile.books;
+    const books = this.userState.profile?.books;
     const hasBooks = books && books.length > 0;
 
     if (this.userState.isLoggedIn) {
@@ -60,7 +60,7 @@ export default class AniNewQuote extends LitElement {
           ${!hasBooks ? html`
             <div class="no-books">
               <span class="error">You need to add a book to your library and select it before you can add a quote.</span>
-              <kemet-button variant="pill" link="profile/library" outlined>Add a book to your library</kemet-button>
+              <kemet-button variant="pill" link="profile/manage" outlined>Add a book to your library</kemet-button>
             </div>` : null
           }
           <kemet-field slug="quote" label="The quote">
@@ -109,7 +109,7 @@ export default class AniNewQuote extends LitElement {
       quote: userData.quote,
       requote: '',
       requotes: [],
-      user_id: user.id,
+      user_id: user?.id,
       book_id: userData.book,
       page: userData.page,
       note: userData.note,
@@ -146,7 +146,7 @@ export default class AniNewQuote extends LitElement {
   }
 
   makeBookOptions() {
-    const books = this.userState.profile.books as IBook[];
+    const books = this.userState.profile?.books as IBook[];
     return books.map((book: IBook) => html`<kemet-option label="${book.title}" value="${book.id}"></kemet-option>`)
   }
 
