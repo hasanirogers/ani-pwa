@@ -81,12 +81,10 @@ export default class AniInformation extends LitElement {
       <kemet-card>
         <ani-first-welcome .name=${displayName}></ani-first-welcome>
         <nav>
-          <kemet-button variant="text" link=${`/user/${this.userState?.profile?.id}`}>View your public profile</kemet-button>
-          &nbsp;|&nbsp;
-          <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
+          <kemet-button variant="text" link=${`/user/${this.userState?.profile?.id}`}>View public profile</kemet-button>
           ${this.userState.profile?.member_id
-            ? html`&nbsp;|&nbsp;<kemet-button variant="text" @click=${() => this.handleManageMembership()}>Manage Membership</kemet-button>`
-            : html`&nbsp;|&nbsp;<kemet-button variant="text" link="/membership/checkout">Become a Member</kemet-button>`
+            ? html`<kemet-button variant="text" @click=${() => this.handleManageMembership()}>Manage Membership</kemet-button>`
+            : html`<kemet-button variant="text" link="/membership/checkout">Become a Member</kemet-button>`
           }
         </nav>
         <hr />
@@ -132,6 +130,7 @@ export default class AniInformation extends LitElement {
             <kemet-button variant="rounded">
               Update Profile <kemet-icon slot="right" icon="chevron-right"></kemet-icon>
             </kemet-button>
+            <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
             <kemet-button variant="text" @click=${() => this.modalsState.setDeleteUserOpened(true)}>
               Remove Account
             </kemet-button>

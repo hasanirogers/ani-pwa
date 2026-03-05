@@ -31,6 +31,22 @@ export const informationStyles = css`
     text-align: center;
   }
 
+  nav {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+
+    kemet-button {
+      white-space: nowrap;
+    }
+  }
+
+  kemet-button {
+    color: var(--app-link-color);
+  }
+
   kemet-card {
     margin: 0 auto;
   }
@@ -69,7 +85,11 @@ export const informationStyles = css`
   }
 
   .actions {
-     text-align: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
   }
 `;
 
