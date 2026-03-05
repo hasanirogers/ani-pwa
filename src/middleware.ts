@@ -12,6 +12,7 @@ export const onRequest = defineMiddleware(async ({ locals, cookies }, next) => {
 
       // Try to get profile from cookie first, fallback to database
       const profileCookie = cookies.get('user-profile')?.value;
+      console.log('profileCookie', profileCookie);
       let profile = null;
 
       if (profileCookie) {

@@ -139,6 +139,5 @@ export const setCookie = (
   if (domain) {
     cookieString += `; domain=${domain}`;
   }
-
   document.cookie = cookieString;
 };
