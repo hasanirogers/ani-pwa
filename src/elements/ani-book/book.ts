@@ -68,20 +68,16 @@ export default class aniBook extends LitElement {
     this.addEventListener('click', async () => {
       this.selected = !this.selected;
       this.selected ? this.addBook() : this.removeBook();
-      // const options = {
-      //   method: 'GET',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${this.userState.user.jwt}`
-      //   }
-      // };
-      // const userProfile = await fetch(`${API_URL}/api/users/me?populate=books`, options).then((response) => response.json());
-      // this.userState.updateProfile(userProfile);
     });
   }
 
   async addBook() {
-    let book;
+    if (!this.userState.profile) {
+      console.error('Profile is required to add books');
+      return;
+    }
+
+    let book: IBook;
     const bookResponse = await fetch(`/api/books/${this.identifier}`).then(response => response.json());
 
     if (bookResponse.success) {
@@ -103,7 +99,9 @@ export default class aniBook extends LitElement {
       book = createResponse.data;
     }
 
-    const books = this.userState.profile.books as IBook[];
+    const books = this.userState.profile?.books as IBook[];
+
+    console.log('books', books);
 
     this.userState.updateProfile({
       ...this.userState.profile,
@@ -115,16 +113,21 @@ export default class aniBook extends LitElement {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ book_ids: this.userState.profile.books?.map(book => book.id) })
+      body: JSON.stringify({ book_ids: this.userState.profile?.books?.map(book => book.id) })
     };
 
-    await fetch(`/api/users/details/${this.userState.profile.id}`, updateBooksOptions)
+    await fetch(`/api/users/details/${this.userState.profile?.id}`, updateBooksOptions)
       .then((response) => response.json())
       .catch((error) => console.error(error));
   }
 
   async removeBook() {
-    const books = this.userState.profile.books as IBook[];
+    if (!this.userState.profile) {
+      console.error('Profile is required to remove books');
+      return;
+    }
+
+    const books = this.userState.profile?.books as IBook[];
 
     this.userState.updateProfile({
       ...this.userState.profile,
@@ -136,10 +139,10 @@ export default class aniBook extends LitElement {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ book_ids: this.userState.profile.books?.map(book => book.id) })
+      body: JSON.stringify({ book_ids: this.userState.profile?.books?.map(book => book.id) })
     };
 
-    await fetch(`/api/users/details/${this.userState.profile.id}`, updateBooksOptions)
+    await fetch(`/api/users/details/${this.userState.profile?.id}`, updateBooksOptions)
       .then((response) => response.json())
       .catch((error) => console.error(error));
   }

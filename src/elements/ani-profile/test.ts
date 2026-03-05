@@ -8,12 +8,12 @@ import { switchRoute } from '../../shared/utilities';
 
 import AniInformation from './information';
 import AniChangePassword from './change-password';
-import AniLibrary from './library';
+import AniLibrary from './manage';
 import AniBook from '../ani-book/book';
 
 import './information';
 import './change-password';
-import './library';
+import './manage';
 
 import 'kemet-ui/dist/components/kemet-icon/kemet-icon';
 import 'kemet-ui/dist/components/kemet-card/kemet-card';

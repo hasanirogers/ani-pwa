@@ -80,10 +80,10 @@ export const libraryStyles = css`
 
   ul {
     display: grid;
-    grid-template-columns: repeat(1, minmax(150px, 1fr));
-    gap: var(--kemet-spacer-xl);
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    gap: var(--kemet-spacer-lg);
     flex-wrap: wrap;
-    margin: var(--kemet-spacer-xl);
+    margin: var(--kemet-spacer-xl) 0;
     padding: 0;
     list-style: none;
   }
@@ -109,19 +109,19 @@ export const libraryStyles = css`
 
   @media screen and (min-width: 768px) {
     ul {
-      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      grid-template-columns: repeat(3, minmax(150px, 1fr));
     }
   }
 
   @media screen and (min-width: 1024px) {
     ul {
-      grid-template-columns: repeat(3, minmax(150px, 1fr));
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
     }
   }
 
   @media screen and (min-width: 1280px) {
     ul {
-      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
     }
   }
 `;

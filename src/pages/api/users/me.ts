@@ -1,18 +1,12 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabaseAdmin, supabaseServerClient } from "../../../shared/database";
+import { supabaseAdmin } from "../../../shared/database";
 import { getStripe } from "../../../shared/utilities";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals, cookies }) => {
-  console.log('=== ME ENDPOINT DEBUG ===');
-  console.log('locals.user exists:', !!locals.user);
-  console.log('locals.user email:', locals.user?.email);
-  console.log('locals.user id:', locals.user?.id);
-
   try {
-    // Check if user is available from middleware
     if (!locals.user) {
       console.log('No user in locals, returning 401');
       return new Response(
@@ -21,17 +15,12 @@ export const GET: APIRoute = async ({ request, locals, cookies }) => {
       );
     }
 
-    console.log('User found in locals, querying database...');
-
     // Use admin client with service role key for database operations (no auth needed)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('Profiles')
       .select('*')
       .eq('uuid', locals.user.id)
       .single();
-
-    console.log('Profile query result:', { profile: !!profile, error: !!profileError });
-    console.log('Profile error:', profileError);
 
     if (profileError) {
       console.log('Profile error details:', profileError);

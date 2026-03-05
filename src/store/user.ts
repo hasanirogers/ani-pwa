@@ -1,6 +1,6 @@
 import { createStore } from 'zustand/vanilla';
 import { type IProfile } from '../shared/interfaces';
-import { deleteCookie, getCookie } from '../shared/utilities';
+import { deleteCookie } from '../shared/utilities';
 
 // Extend Window interface to include user property
 declare global {
@@ -25,8 +25,30 @@ const getProfileFromWindow = (): IProfile | null => {
   return null;
 };
 
+const getProfile = async () => {
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+  try {
+    const userProfile = await fetch(`/api/users/me`, options)
+      .then((response) => response.json());
+    if (userProfile) {
+      return userProfile;
+    }
+  } catch (error) {
+    console.log(error);
+    // the api has failed turn on maintenance mode
+  }
+  return null;
+}
+
+const initProfile = getProfileFromWindow() ? await getProfile() : null;
+
 const store = createStore<IUserStore>(set => ({
-  profile: getProfileFromWindow(),
+  profile: initProfile,
   updateProfile: (profile: IProfile) => set(() => ({ profile })),
   isLoggedIn: getProfileFromWindow() !== null,
   logout: async () => {
@@ -34,6 +56,7 @@ const store = createStore<IUserStore>(set => ({
     const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
     deleteCookie(`sb-${projectName}-auth-token`);
     deleteCookie(`sb-${projectName}-auth-token-refresh`);
+    deleteCookie('user-profile');
     window.user = undefined;
     window.location.href = "/";
   }

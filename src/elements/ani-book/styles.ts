@@ -33,7 +33,13 @@ export default css`
   }
 
   header {
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 5vw, 1.5rem);
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   footer {

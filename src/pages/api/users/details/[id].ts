@@ -100,6 +100,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       .from('Profiles')
       .update(body)
       .eq('id', userId)
+      .single()
 
     if (updateError) {
       console.log(updateError);
