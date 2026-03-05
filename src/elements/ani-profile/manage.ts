@@ -47,7 +47,7 @@ export default class aniManage extends LitElement {
       <p>Search for a book and click on it to add it to your library. Click again to remove it from your library.</p>
       <form method="get" action="" @submit=${() => this.handleBookSearch()}>
         <kemet-field slug="search" label="Search by author or book title">
-          <kemet-input type="search" slot="input" name="search" rounded filled @keypress=${() => this.handleBookSearch()} @kemet-input-focused=${(event: CustomEvent) => this.handleBookSearchFocus(event)}></kemet-input>
+          <kemet-input type="search" slot="input" name="search" rounded filled @kemet-input-input=${() => this.handleBookSearch()} @kemet-input-focused=${(event: CustomEvent) => this.handleBookSearchFocus(event)}></kemet-input>
         </kemet-field>
         ${this.makeBooks()}
       </form>
