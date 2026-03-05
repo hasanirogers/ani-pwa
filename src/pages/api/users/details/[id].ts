@@ -7,7 +7,7 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params }) => {
   try {
-    const userId = params.id;
+    const userId = Number(params.id);
 
     const { data: profile, error: profileError } = await supabase
       .from('Profiles')
@@ -52,7 +52,7 @@ export const GET: APIRoute = async ({ params }) => {
     const { data: followers, error: followersError } = await supabase
       .from('Profiles')
       .select('*')
-      .filter('following', 'cs', parseInt(userId as string));
+      .filter('following', 'cs', userId);
 
     if (followersError ) {
       console.log({ errors: { followersError } });
@@ -91,7 +91,7 @@ export const GET: APIRoute = async ({ params }) => {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    const userId = Number(params.id);
+    const userId = params.id;
     const body = await request.json();
 
     delete body.filepond;

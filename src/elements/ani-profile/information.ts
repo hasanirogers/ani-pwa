@@ -130,7 +130,6 @@ export default class AniInformation extends LitElement {
             <kemet-button variant="rounded">
               Update Profile <kemet-icon slot="right" icon="chevron-right"></kemet-icon>
             </kemet-button>
-            &nbsp;&nbsp;&nbsp;&nbsp;|
             <kemet-button variant="text" @click=${() => this.modalsState.setDeleteUserOpened(true)}>
               Remove Account
             </kemet-button>
