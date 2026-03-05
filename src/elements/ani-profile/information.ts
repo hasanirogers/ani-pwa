@@ -186,13 +186,14 @@ export default class AniInformation extends LitElement {
     // Profile Information
     // -------------------
     const formData = new FormData(this.userForm) as any;
-
+    const updatedInformation = Object.fromEntries(formData);
+    console.log('updatedInformation', updatedInformation);
     const options = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(Object.fromEntries(formData))
+      body: JSON.stringify(updatedInformation)
     };
 
     const profile = await fetch(`/api/users/details/${this.userState.profile.id}`, options)
