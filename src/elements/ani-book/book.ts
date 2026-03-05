@@ -53,6 +53,13 @@ export default class aniBook extends LitElement {
           <header>${this.book?.volumeInfo?.title}</header>
           <footer>${this.book?.volumeInfo?.authors ? this.book.volumeInfo?.authors[0] : ''}</footer>
         </figure>
+        <section>
+          <div>
+            <kemet-icon icon="check-lg" size="48"></kemet-icon>
+            <strong>Added to Library</strong>
+            <span>Click to remove</span>
+          </div>
+        </section>
       `;
     }
     return html`<p>There has been an error loading the book details.</p>`;
@@ -100,8 +107,6 @@ export default class aniBook extends LitElement {
     }
 
     const books = this.userState.profile?.books as IBook[];
-
-    console.log('books', books);
 
     this.userState.updateProfile({
       ...this.userState.profile,

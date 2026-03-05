@@ -17,6 +17,7 @@ import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 import { setCookie } from '../../shared/utilities.ts';
 import { ENUM_ALERT_STATUS } from '../../shared/enums.ts';
 
+import '../../elements/ani-first-welcome/first-welcome';
 
 FilePond.registerPlugin(
   FilePondPluginFileEncode,
@@ -78,8 +79,9 @@ export default class AniInformation extends LitElement {
     const displayName = this.userState?.profile?.display_name ?? this.userState?.profile?.email;
     return html`
       <kemet-card>
+        <ani-first-welcome .name=${displayName}></ani-first-welcome>
         <nav>
-          <kemet-button variant="text" link=${`/user/${this.userState?.profile?.id}`}>View Profile</kemet-button>
+          <kemet-button variant="text" link=${`/user/${this.userState?.profile?.id}`}>View your public profile</kemet-button>
           &nbsp;|&nbsp;
           <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
           ${this.userState.profile?.member_id
@@ -112,7 +114,7 @@ export default class AniInformation extends LitElement {
                   </kemet-field>
                 </p>
                 <p>
-                  <kemet-field label="Avatar URL" slug="avatar_url">
+                  <kemet-field label="Profile Picture URL" slug="avatar_url">
                     <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
                   </kemet-field>
                 </p>

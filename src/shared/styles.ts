@@ -71,6 +71,13 @@ export default css`
     --kemet-button-padding: 0.75rem 1rem;
   }
 
+  kemet-fab {
+    position: fixed;
+    z-index: 9;
+    bottom: var(--kemet-spacer-3xl);
+    right: var(--kemet-spacer-lg);
+  }
+
   kemet-tooltip {
     --kemet-popper-width: 80vw;
     position: relative;

@@ -5,6 +5,7 @@ import userStore, { type IUserStore } from '../../store/user';
 import quoteStore, { type IQuoteStore } from '../../store/quote';
 import AniFeed from '../ani-feed/feed';
 import styles from './styles';
+import sharedStyles from '../../shared/styles.ts';
 
 import '../ani-loader/loader';
 import '../ani-feed/feed';
@@ -12,7 +13,7 @@ import '../ani-feed/feed';
 
 @customElement('ani-home')
 export default class AniHome extends LitElement {
-  static styles = [styles];
+  static styles = [sharedStyles, styles];
 
   @state()
   modalsState: IModalsStore = modalsStore.getInitialState();

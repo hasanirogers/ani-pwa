@@ -42,7 +42,7 @@ export class AniLoginCallback extends LitElement {
       });
 
       if (response.ok) {
-        window.location.href = '/';
+        window.location.href = '/profile';
       } else {
         const data = await response.json();
         this.alertState.setStatus('error');
