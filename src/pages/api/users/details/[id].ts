@@ -91,7 +91,7 @@ export const GET: APIRoute = async ({ params }) => {
 
 export const PUT: APIRoute = async ({ params, request }) => {
   try {
-    const userId = params.id;
+    const userId = Number(params.id);
     const body = await request.json();
 
     delete body.filepond;
