@@ -103,7 +103,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       .single()
 
     if (updateError) {
-      console.log(updateError);
+      console.error(updateError);
       return new Response(
         JSON.stringify({ success: false, message: "Failed to update profile.", error: updateError }),
         { status: 400 }
