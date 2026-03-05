@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabaseAdmin } from "../../../shared/database";
-import { getStripe } from "../../../shared/utilities";
+import { supabase, supabaseAdmin } from "../../../shared/database";
+import { determineAvatar, getStripe } from "../../../shared/utilities";
 
 export const prerender = false;
 
@@ -31,13 +31,21 @@ export const GET: APIRoute = async ({ request, locals, cookies }) => {
       .select('*')
       .in('id', profile?.book_ids || []);
 
-    console.log('Books query result:', { books: books?.length || 0, error: !!booksError });
+    const { data: { publicUrl } } = supabase
+      .storage
+      .from('avatars')
+      .getPublicUrl('');
 
     if (profile) {
-      const data = { ...profile, books: books || [] };
-      console.log('Returning successful response with', books?.length || 0, 'books');
+      const completeProfile = {
+        ...profile,
+        avatar: determineAvatar(publicUrl, profile.avatar, profile.avatar_url),
+        books: books || []
+      };
+      console.log(profile);
+
       return new Response(
-        JSON.stringify(data),
+        JSON.stringify(completeProfile),
         { status: 200 }
       );
     }

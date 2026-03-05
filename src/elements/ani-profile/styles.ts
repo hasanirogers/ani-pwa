@@ -78,7 +78,7 @@ export const informationStyles = css`
 
   .profile-image {
     text-align: center;
-    max-width: 128px;
+    width: 148px;
     position: relative;
     margin: auto;
   }
@@ -128,6 +128,17 @@ export const informationStyles = css`
       flex: 1;
     }
   }
+
+  .filepond--panel-root {
+    background: transparent !important;
+    border: 2px solid var(--app-border-color);
+  }
+
+  .filepond--label-action {
+    color: var(--app-link-color);
+    text-decoration: none !important;
+  }
+  .
 `;
 
 export const libraryStyles = css`

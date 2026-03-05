@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, query, queryAll, state } from 'lit/decorators.js';
 import userStore, { type IUserStore } from '../../store/user.ts';
 import alertStore, { type IAlertStore } from '../../store/alert.ts';
 import modalsStore, { type IModalsStore } from '../../store/modals.ts';
@@ -16,6 +16,7 @@ import FilePondPluginImageResize from 'filepond-plugin-image-resize';
 import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
 import { setCookie } from '../../shared/utilities.ts';
 import { ENUM_ALERT_STATUS } from '../../shared/enums.ts';
+import KemetHTMLInputElement from 'kemet-ui/dist/components/kemet-input/kemet-input';
 
 import '../../elements/ani-first-welcome/first-welcome';
 
@@ -57,6 +58,9 @@ export default class AniInformation extends LitElement {
   @query('.filepond--root')
   filePondRoot!: any;
 
+  @queryAll('[required]')
+  requiredFields!: NodeListOf<HTMLElement>;
+
   constructor() {
     super();
 
@@ -90,36 +94,27 @@ export default class AniInformation extends LitElement {
         <hr />
         <form @submit=${(event: SubmitEvent) => this.updateProfile(event)}>
           <fieldset>
-            <legend>Welcome, ${displayName}</legend>
+            ${this.userState.profile?.books && this.userState.profile.books.length > 0 ? html`<legend>Welcome, ${displayName}</legend>` : ''}
             <section class="profile">
-              <br />
-              <div class="profile-image">${this.makeProfileImage()}</div>
-              <hr /><br />
               <div class="details">
-                <div class="name">
-                  <p>
-                    <kemet-field label="First Name" slug="first-name">
-                      <kemet-input slot="input" name="first_name" rounded filled value=${this.userState?.profile?.first_name}></kemet-input>
-                    </kemet-field>
-                  </p>
-                  <p>
-                    <kemet-field label="Last Name" slug="last-name">
-                      <kemet-input slot="input" name="last_name" rounded filled value=${this.userState?.profile?.last_name}></kemet-input>
-                    </kemet-field>
-                  </p>
-                </div>
-                <p>
-                  <kemet-field label="Display Name" slug="display_name">
-                    <kemet-input slot="input" name="display_name" rounded filled value=${this.userState?.profile?.display_name}></kemet-input>
+                <br />
+                <div>
+                  <kemet-field label="* Display Name" slug="display_name">
+                    <kemet-input slot="input" name="display_name" required rounded filled validate-on-blur value=${this.userState?.profile?.display_name}></kemet-input>
                   </kemet-field>
-                </p>
+                  <kemet-tooltip strategy="absolute" distance="30">
+                    <kemet-icon icon="info-circle-fill" slot="trigger" aria-label="Information"></kemet-icon>
+                    <div slot="content">Your display name is required. It is how you are known to other users on Ani.</div>
+                  </kemet-tooltip>
+                </div>
+                <div class="profile-image">${this.makeProfileImage()}</div>
                 <div>
                   <kemet-field label="Profile Picture URL" slug="avatar_url">
                     <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
                   </kemet-field>
                   <kemet-tooltip strategy="absolute" distance="30">
                     <kemet-icon icon="info-circle-fill" slot="trigger" aria-label="Information"></kemet-icon>
-                    <div slot="content">Enter a url here that you want to use as a profile picture. It will override the profile picture above.</div>
+                    <div slot="content">Enter a url here that you want to use as a profile picture. If you upload a photo as well we'll use that picture instead.</div>
                   </kemet-tooltip>
                 </div>
                 <p>
@@ -129,6 +124,21 @@ export default class AniInformation extends LitElement {
                   </kemet-field>
                 </p>
               </div>
+              <br />
+              <div class="name">
+                <p>
+                  <kemet-field label="First Name" slug="first-name">
+                    <kemet-input slot="input" name="first_name" rounded filled value=${this.userState?.profile?.first_name}></kemet-input>
+                  </kemet-field>
+                </p>
+                <p>
+                  <kemet-field label="Last Name" slug="last-name">
+                    <kemet-input slot="input" name="last_name" rounded filled value=${this.userState?.profile?.last_name}></kemet-input>
+                  </kemet-field>
+                </p>
+              </div>
+              <br />
+              <small>We'll never use your real first and last name on the app and we'll only apply what you've entered here to fill out your membership signup form if you chose to join.</small>
             </section>
           </fieldset>
           <br />
@@ -152,7 +162,7 @@ export default class AniInformation extends LitElement {
 
   initFilePond() {
     this.filePond = FilePond.create(this.profileInput, {
-      labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`,
+      labelIdle: `<span class="filepond--label-action">Upload Profile Picture</span>`,
       imagePreviewHeight: 170,
       imageCropAspectRatio: '1:1',
       imageResizeTargetWidth: 200,
@@ -165,8 +175,8 @@ export default class AniInformation extends LitElement {
 
   makeProfileImage() {
     const profileImage = this.userState.profile?.avatar;
-
-    if (profileImage && !this.showUploadProfileImage) {
+    const profileImageIsUpload  = profileImage?.includes('supabase.co/storage');
+    if (profileImage && !this.showUploadProfileImage && profileImageIsUpload) {
       return html`
         <button class="image" @click=${() => this.showUploadProfileImage = true}>
           <div class="profile-picture" style="background-image: url('${profileImage}')"></div>
@@ -180,7 +190,6 @@ export default class AniInformation extends LitElement {
     this.showUploadProfileImage = true;
 
     return html`
-      ${profileImage ? html`<button class="close" @click=${() => this.showUploadProfileImage = false} aria-label="delete"><kemet-icon icon="x-lg" size="32"></kemet-icon></button>` : ''}
       <input type="file" class="filepond" name="filepond" accept="image/png, image/jpeg, image/gif"/>
     `;
   }
@@ -188,7 +197,7 @@ export default class AniInformation extends LitElement {
   async updateProfile(event: SubmitEvent) {
     event.preventDefault();
 
-    if (!this.userState.profile) {
+    if (!this.userState.profile || this.hasErrors()) {
       return;
     }
 
@@ -290,6 +299,17 @@ export default class AniInformation extends LitElement {
     } else {
       window.location.href = url;
     }
+  }
+
+  hasErrors(): boolean {
+    const hasErrors = Array.from(this.requiredFields).some(field => (field as any).status === 'error');
+    if (hasErrors) {
+      this.alertState.setStatus('error');
+      this.alertState.setMessage('Please fix any errors in the form before submitting.');
+      this.alertState.setOpened(true);
+      this.alertState.setIcon('exclamation-circle');
+    }
+    return hasErrors;
   }
 }
 
