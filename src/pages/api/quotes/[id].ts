@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ params }) => {
         likes,
         requotes,
         book:Books (id, title, identifier, authors),
-        user:Profiles (id, display_name, email, avatar, avatar_url)
+        user:Profiles (*)
       `)
       .eq('id', id)
       .single();

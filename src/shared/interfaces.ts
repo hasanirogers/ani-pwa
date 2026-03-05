@@ -87,6 +87,7 @@ export interface IProfile {
   avatar_url: string;
   member_id?: string;
   member_free_pass?: boolean;
+  is_bot?: boolean;
 }
 
 // export interface IProfile extends IUser {}

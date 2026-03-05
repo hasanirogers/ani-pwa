@@ -95,7 +95,7 @@ export const truncateString = (str: string, count: number): string => {
 };
 
 
-export const determineAvatar = (publicURL: string, avatar: string, avatarUrl: string) => {
+export const determineAvatar = (publicURL: string, avatar: string | null, avatarUrl: string | null) => {
   return avatar ? `${publicURL}${avatar}` : avatarUrl || null;
 };
 

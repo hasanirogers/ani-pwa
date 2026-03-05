@@ -5,6 +5,7 @@ import alertStore, { type IAlertStore } from '../../store/alert';
 import styles from './styles';
 import sharedStyles from '../../shared/styles';
 
+const redirectPath = !!localStorage.getItem('has_updated_profile') ? '/' : '/profile';
 
 @customElement('ani-login-callback')
 export class AniLoginCallback extends LitElement {
@@ -42,7 +43,7 @@ export class AniLoginCallback extends LitElement {
       });
 
       if (response.ok) {
-        window.location.href = '/profile';
+        window.location.href = redirectPath;
       } else {
         const data = await response.json();
         this.alertState.setStatus('error');
@@ -71,7 +72,7 @@ export class AniLoginCallback extends LitElement {
         this.alertState.setOpened(true);
         this.alertState.setIcon('exclamation-circle');
       } else {
-        window.location.href = '/';
+        window.location.href = redirectPath;
       }
     }
   }

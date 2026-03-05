@@ -94,28 +94,34 @@ export default class AniInformation extends LitElement {
             <section class="profile">
               <br />
               <div class="profile-image">${this.makeProfileImage()}</div>
-              <hr />
-              <div>
-                <p>
-                  <kemet-field label="First Name" slug="first-name">
-                    <kemet-input slot="input" name="first_name" rounded filled value=${this.userState?.profile?.first_name}></kemet-input>
-                  </kemet-field>
-                </p>
-                <p>
-                  <kemet-field label="Last Name" slug="last-name">
-                    <kemet-input slot="input" name="last_name" rounded filled value=${this.userState?.profile?.last_name}></kemet-input>
-                  </kemet-field>
-                </p>
+              <hr /><br />
+              <div class="details">
+                <div class="name">
+                  <p>
+                    <kemet-field label="First Name" slug="first-name">
+                      <kemet-input slot="input" name="first_name" rounded filled value=${this.userState?.profile?.first_name}></kemet-input>
+                    </kemet-field>
+                  </p>
+                  <p>
+                    <kemet-field label="Last Name" slug="last-name">
+                      <kemet-input slot="input" name="last_name" rounded filled value=${this.userState?.profile?.last_name}></kemet-input>
+                    </kemet-field>
+                  </p>
+                </div>
                 <p>
                   <kemet-field label="Display Name" slug="display_name">
                     <kemet-input slot="input" name="display_name" rounded filled value=${this.userState?.profile?.display_name}></kemet-input>
                   </kemet-field>
                 </p>
-                <p>
+                <div>
                   <kemet-field label="Profile Picture URL" slug="avatar_url">
                     <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
                   </kemet-field>
-                </p>
+                  <kemet-tooltip strategy="absolute" distance="30">
+                    <kemet-icon icon="info-circle-fill" slot="trigger" aria-label="Information"></kemet-icon>
+                    <div slot="content">Enter a url here that you want to use as a profile picture. It will override the profile picture above.</div>
+                  </kemet-tooltip>
+                </div>
                 <p>
                   <kemet-field label="Bio" slug="bio">
                     <kemet-textarea slot="input" name="bio" rounded filled value=${this.userState?.profile?.bio}></kemet-textarea>
@@ -130,12 +136,15 @@ export default class AniInformation extends LitElement {
             <kemet-button variant="rounded">
               Update Profile <kemet-icon slot="right" icon="chevron-right"></kemet-icon>
             </kemet-button>
-            <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
-            <kemet-button variant="text" @click=${() => this.modalsState.setDeleteUserOpened(true)}>
-              Remove Account
-            </kemet-button>
           </div>
         </form>
+        <br /><hr /><br />
+        <div class="actions">
+          <kemet-button variant="text" @click=${() => this.userState.logout()}>Log Out</kemet-button>
+          <kemet-button variant="text" @click=${() => this.modalsState.setDeleteUserOpened(true)}>
+            Remove Account
+          </kemet-button>
+        </div>
       </kemet-card>
       <br />
     `;
@@ -182,6 +191,8 @@ export default class AniInformation extends LitElement {
     if (!this.userState.profile) {
       return;
     }
+
+    window.localStorage.setItem('has_updated_profile', 'true');
 
     // Profile Information
     // -------------------

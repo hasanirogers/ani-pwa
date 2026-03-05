@@ -7,6 +7,12 @@ export const informationStyles = css`
     display: block;
   }
 
+  p {
+    margin: 0;
+  }
+
+
+
   nav {
     text-align: center;
   }
@@ -90,6 +96,37 @@ export const informationStyles = css`
     justify-content: center;
     flex-wrap: wrap;
     text-align: center;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    & > * {
+      position: relative;
+      kemet-tooltip {
+        --kemet-popper-width: 320px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        [slot="content"] {
+          text-align: left;
+        }
+      }
+    }
+  }
+
+  .name {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+
+    & > * {
+      flex: 1;
+    }
   }
 `;
 
