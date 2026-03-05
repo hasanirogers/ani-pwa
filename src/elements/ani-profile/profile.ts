@@ -37,9 +37,9 @@ export default class aniProfile extends LitElement {
   render() {
     return html`
       <kemet-tabs placement="top" selected=${this.page} divider>
-        <kemet-tab slot="tab" link="information" @kemet-tab-selected=${() => this.handleTabSelected('information')}><kemet-icon icon="info-circle" size="24"></kemet-icon>&nbsp;&nbsp;Profile</kemet-tab>
+        <kemet-tab slot="tab" link="information" @kemet-tab-selected=${() => this.handleTabSelected('information')}><kemet-icon icon="person" size="24"></kemet-icon>&nbsp;&nbsp;Profile</kemet-tab>
         <kemet-tab slot="tab" link="manage" @kemet-tab-selected=${() => this.handleTabSelected('manage')}><kemet-icon icon="collection" size="24"></kemet-icon>&nbsp;&nbsp;Manage</kemet-tab>
-        <kemet-tab slot="tab" link="library" @kemet-tab-selected=${() => this.handleTabSelected('library')}><kemet-icon icon="collection" size="24"></kemet-icon>&nbsp;&nbsp;Library</kemet-tab>
+        <kemet-tab slot="tab" link="library" @kemet-tab-selected=${() => this.handleTabSelected('library')}><kemet-icon icon="book" size="24"></kemet-icon>&nbsp;&nbsp;Library</kemet-tab>
         <kemet-tab-panel slot="panel" panel="information">
           <ani-information></ani-information>
         </kemet-tab-panel>
