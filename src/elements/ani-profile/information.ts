@@ -117,12 +117,16 @@ export default class AniInformation extends LitElement {
                     <div slot="content">Enter a url here that you want to use as a profile picture. If you upload a photo as well we'll use that picture instead.</div>
                   </kemet-tooltip>
                 </div>
-                <p>
+                <div>
                   <kemet-field label="Bio" slug="bio">
                     <kemet-textarea slot="input" name="bio" rounded filled value=${this.userState?.profile?.bio}></kemet-textarea>
                     <kemet-count slot="component" message="characters remaining." limit="1000" validate-immediately></kemet-count>
                   </kemet-field>
-                </p>
+                  <kemet-tooltip strategy="absolute" distance="30">
+                    <kemet-icon icon="info-circle-fill" slot="trigger" aria-label="Information"></kemet-icon>
+                    <div slot="content">Your bio shows up on your public profile page for other users to see.</div>
+                  </kemet-tooltip>
+                </div>
               </div>
               <br />
               <div class="name">
