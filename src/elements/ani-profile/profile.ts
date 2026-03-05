@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import userStore, { type IUserStore } from '../../store/user.ts';
 import sharedStyles from '../../shared/styles.ts';
 
 import './information.ts';
@@ -12,6 +13,22 @@ export default class aniProfile extends LitElement {
 
   @property()
   page: string = 'information';
+
+  @state()
+  userState: IUserStore = userStore.getInitialState();
+
+  constructor() {
+    super();
+    userStore.subscribe((state) => {
+      this.userState = state;
+    });
+  }
+
+  firstUpdated() {
+    if (!this.userState.isLoggedIn) {
+      window.location.href = '/';
+    }
+  }
 
   render() {
     return html`
