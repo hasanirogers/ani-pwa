@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabase, supabaseAdmin, supabaseServerClient } from "../../../../shared/database";
+import { supabase, supabaseAdmin } from "../../../../shared/database";
 import { determineAvatar } from "../../../../shared/utilities";
 
 export const prerender = false;
@@ -103,9 +103,6 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
         { status: 401 }
       );
     }
-
-    console.log('Auth user UUID from locals:', locals.user.id);
-    console.log('Updating profile ID:', userId);
 
     // Use admin client to bypass RLS for profile updates
     const { error: updateError } = await supabaseAdmin

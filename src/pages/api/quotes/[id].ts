@@ -32,12 +32,13 @@ export const GET: APIRoute = async ({ params }) => {
         .from('avatars')
         .getPublicUrl('');
 
+      const user = Array.isArray(quote.user) ? quote.user[0] : quote.user;
       const response = {
         ...quote,
         user: {
-          ...quote.user,
-          // avatar: `${publicUrl}/${quote.user.avatar}`
-          avatar: determineAvatar(publicUrl, quote.user.avatar, quote.user.avatar_url)
+          ...user,
+          // avatar: `${publicUrl}/${user.avatar}`
+          avatar: determineAvatar(publicUrl, user.avatar, user.avatar_url)
         }
       };
 
@@ -96,9 +97,17 @@ export const PUT: APIRoute = async ({ params, request }) => {
   }
 }
 
-export const DELETE: APIRoute = async ({ params, request }) => {
+export const DELETE: APIRoute = async ({ params, request, locals }) => {
   const quote_id = params.id;
   const body = await request.json();
+
+  // Check if user is authenticated via middleware
+  if (!locals.user) {
+    return new Response(
+      JSON.stringify({ success: false, message: "You are not logged in." }),
+      { status: 401 }
+    );
+  }
 
   try {
     const { data, error } = await supabase
