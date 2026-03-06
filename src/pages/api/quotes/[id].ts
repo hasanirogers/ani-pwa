@@ -111,6 +111,25 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
 
   try {
     console.log('Attempting to delete quote with ID:', quote_id);
+    console.log('Authenticated user:', locals.user?.id);
+
+    // First check if quote exists and who owns it
+    const { data: existingQuote, error: checkError } = await supabase
+      .from('Quotes')
+      .select('id, user_id')
+      .eq('id', quote_id)
+      .single();
+
+    console.log('Existing quote:', existingQuote, 'check error:', checkError);
+
+    if (checkError || !existingQuote) {
+      console.log('Quote not found');
+      return new Response(
+        JSON.stringify({ success: false, message: "Quote not found." }),
+        { status: 404 }
+      );
+    }
+
     const { data: deletedQuote, error } = await supabase
       .from('Quotes')
       .delete()
