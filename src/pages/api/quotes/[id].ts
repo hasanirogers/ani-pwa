@@ -123,20 +123,21 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const { data: originalQuote } = await supabase
-      .from('Quotes')
-      .select('requotes')
-      .eq('id', body.originalQuoteId)
-      .single();
-
-    if (!originalQuote) {
-      return new Response(
-        JSON.stringify({ success: false, message: "Quote not found" }),
-        { status: 404 }
-      );
-    }
-
+    // Only handle original quote if this is a requote
     if (body.isRequote) {
+      const { data: originalQuote } = await supabase
+        .from('Quotes')
+        .select('requotes')
+        .eq('id', body.originalQuoteId)
+        .single();
+
+      if (!originalQuote) {
+        return new Response(
+          JSON.stringify({ success: false, message: "Original quote not found" }),
+          { status: 404 }
+        );
+      }
+
       const { error: originalQuoteError } = await supabase
         .from('Quotes')
         .update({
