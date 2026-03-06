@@ -1,15 +1,18 @@
 import { defineMiddleware } from 'astro:middleware';
-import { supabaseServerClient } from './shared/database';
 
 export const onRequest = defineMiddleware(async ({ locals, cookies, request }, next) => {
   // Check for auth cookies first before creating Supabase client
   const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
   const accessToken = cookies.get(`sb-${projectName}-auth-token`)?.value;
+  const refreshToken = cookies.get(`sb-${projectName}-auth-token-refresh`)?.value;
 
   console.log('Auth token found:', !!accessToken);
+  console.log('Refresh token found:', !!refreshToken);
+  console.log('Project name:', projectName);
+  console.log('Looking for cookie:', `sb-${projectName}-auth-token`);
 
-  // Create Supabase client with auth context
-  locals.supabase = supabaseServerClient(cookies);
+  // Don't create Supabase client in middleware to avoid conflicts
+  // We'll create it in individual API routes as needed
 
   if (accessToken) {
       try {

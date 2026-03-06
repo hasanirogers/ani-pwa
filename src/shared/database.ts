@@ -34,6 +34,12 @@ export const supabaseServerClient = (cookies: AstroCookies) => {
         autoRefreshToken: false, // Don't auto refresh on server side
         detectSessionInUrl: false,
       },
+      global: {
+        headers: {
+          // Don't let Supabase client automatically handle auth
+          // We'll handle it manually in middleware
+        },
+      },
     }
   );
 }

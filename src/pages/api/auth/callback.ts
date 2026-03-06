@@ -5,27 +5,37 @@ import { supabase } from "../../../shared/database";
 export const POST: APIRoute = async ({ request, cookies }) => {
   const body = await request.json();
   const code = body.code;
+  const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
+
+  console.log('Callback - Project name:', projectName);
+  console.log('Callback - Code received:', !!code);
 
   if (code) {
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
+      console.log('Callback - Exchange result:', { error: !!error, hasData: !!data, hasSession: !!data?.session });
+
       if (!error && data.session) {
         const { access_token, refresh_token } = data.session;
+
+        console.log('Callback - Tokens:', { hasAccessToken: !!access_token, hasRefreshToken: !!refresh_token });
 
         // Use Supabase's proper cookie naming convention
         const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
 
         // Set access token cookie
         if (access_token) {
+          console.log('Setting access token cookie for project:', projectName);
           cookies.set(`sb-${projectName}-auth-token`, access_token, {
             path: "/",
             httpOnly: true,
             secure: true,
             sameSite: "lax" as const,
-            maxAge: 3600,
+            maxAge: 604800, // Match refresh token duration (7 days)
             // ...domain
           });
+          console.log('Access token cookie set successfully');
         }
 
         // Set refresh token cookie
