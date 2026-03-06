@@ -121,6 +121,7 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
       .single();
 
     console.log('Existing quote:', existingQuote, 'check error:', checkError);
+    console.log('User profile:', locals.profile);
 
     if (checkError || !existingQuote) {
       console.log('Quote not found');
@@ -131,6 +132,14 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
     }
 
     // Check if user owns this quote
+    if (!locals.profile || !locals.profile.id) {
+      console.log('User profile or profile ID is missing');
+      return new Response(
+        JSON.stringify({ success: false, message: "User profile not found." }),
+        { status: 400 }
+      );
+    }
+
     if (existingQuote.user_id !== locals.profile.id) {
       console.log('User does not own this quote. Quote owner:', existingQuote.user_id, 'Authenticated user profile ID:', locals.profile.id);
       return new Response(
