@@ -131,8 +131,8 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
     }
 
     // Check if user owns this quote
-    if (existingQuote.user_id !== locals.user.id) {
-      console.log('User does not own this quote. Quote owner:', existingQuote.user_id, 'Authenticated user:', locals.user.id);
+    if (existingQuote.user_id !== locals.profile.id) {
+      console.log('User does not own this quote. Quote owner:', existingQuote.user_id, 'Authenticated user profile ID:', locals.profile.id);
       return new Response(
         JSON.stringify({ success: false, message: "You can only delete your own quotes." }),
         { status: 403 }
