@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
-import { createServerClient } from '@supabase/ssr';
+import { supabaseServerClient } from './shared/database';
 
 export const onRequest = defineMiddleware(async ({ locals, cookies, request }, next) => {
   // Check for auth cookies first before creating Supabase client
@@ -8,6 +8,8 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
 
   console.log('Auth token found:', !!accessToken);
 
+  // Create Supabase client with auth context
+  locals.supabase = supabaseServerClient(cookies);
 
   if (accessToken) {
       try {
