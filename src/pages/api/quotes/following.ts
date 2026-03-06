@@ -5,16 +5,13 @@ import { determineAvatar } from "../../../shared/utilities";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, locals }) => {
   const url = new URL(request.url);
   const page = Number(url.searchParams.get('page')) ?? 1;
   const pageSize = Number(url.searchParams.get('pageSize')) ?? 4;
   const search = url.searchParams.get('search') ?? '';
-  const origin = url.origin;
 
-  const me = await fetch(`${origin}/api/users/me`).then(response => response.json());
-
-  if (!me) {
+  if (!locals.user) {
     return new Response(
       JSON.stringify({ success: false, message: "You are not logged in." }),
       { status: 401 }
@@ -32,18 +29,30 @@ export const GET: APIRoute = async ({ request }) => {
     // total pages
     const pageCount = Math.ceil((count ?? 0) / pageSize);
 
-    const { data: quotes, error } = await supabase
-      .from('Quotes')
+    // const { data: quotes, error } = await supabase
+    //   .from('Quotes')
+    //   .select(`
+    //     *,
+    //     book:Books(id, title, identifier, authors),
+    //     user:Profiles(*)
+    //   `)
+    //   .limit(pageSize)
+    //   .range(from, to)
+    //   .order('created_at', { ascending: false })
+    //   .in('user_id', locals.profile.following)
+    //   .or(`quote.ilike.%${search}%`);
+
+
+    const { data: quotes, error} = await supabase
+      .from('quotes_and_books')
       .select(`
         *,
-        book:Books(id, title, identifier, authors),
         user:Profiles(*)
       `)
-      .limit(pageSize)
-      .range(from, to)
+      .or(`quote.ilike.%${search}%,book_title.ilike.%${search}%,book_authors.ilike.%${search}%,book_identifier.ilike.%${search}%`)
       .order('created_at', { ascending: false })
-      .in('user_id', me.following)
-      .or(`quote.ilike.%${search}%`);
+      .in('user_id', locals.profile.following)
+      .range(from, to);
 
     if (quotes) {
       const { data: { publicUrl } } = supabase

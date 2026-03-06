@@ -42,7 +42,6 @@ export const GET: APIRoute = async ({ request, locals, cookies }) => {
         avatar: determineAvatar(publicUrl, profile.avatar, profile.avatar_url),
         books: books || []
       };
-      console.log(profile);
 
       return new Response(
         JSON.stringify(completeProfile),

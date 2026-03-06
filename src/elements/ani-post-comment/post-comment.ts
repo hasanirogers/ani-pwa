@@ -42,7 +42,7 @@ export default class AniPostComment extends LitElement {
   }
 
   render() {
-    const isMember = this.userState.profile.member_free_pass || !!this.userState.profile.member_id;
+    const isMember = this.userState.profile?.member_free_pass || !!this.userState.profile?.member_id;
 
     if (isMember) {
       return html`
@@ -88,7 +88,7 @@ export default class AniPostComment extends LitElement {
       body: JSON.stringify({
         quote_id: this.modalsState.currentQuote?.id,
         comment: formData.get('comment'),
-        profile_id: this.userState.profile.id,
+        profile_id: this.userState.profile?.id,
       })
     }
 
