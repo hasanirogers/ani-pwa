@@ -17,12 +17,7 @@ const options = {
 export const supabase = createClient(`https://${projectID}.supabase.co`, supabaseKey, options);
 export const supabaseAdmin = createClient(`https://${projectID}.supabase.co`, supabaseSecret);
 
-
-
 export const supabaseServerClient = (cookies: AstroCookies) => {
-  const projectID = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
-  const supabaseKey = import.meta.env.SUPABASE_API_KEY_PUBLISHABLE;
-
   // Get auth tokens from cookies
   const accessToken = cookies.get(`sb-${projectID}-auth-token`)?.value;
   const refreshToken = cookies.get(`sb-${projectID}-auth-token-refresh`)?.value;

@@ -41,7 +41,7 @@ export class AniModal extends LitElement {
       </kemet-modal>
       ${this.userState.isLoggedIn
         ? html`
-          <kemet-modal id="modal-comment" rounded effect="fadein-scaleup" .opened=${commentOpened} @kemet-modal-closed=${() => modalsStore.setState({ commentOpened: false })}>
+          <kemet-modal id="modal-comment" close-on-click rounded effect="fadein-scaleup" .opened=${commentOpened} @kemet-modal-closed=${() => modalsStore.setState({ commentOpened: false })}>
             ${commentModalTemplate}
           </kemet-modal>
           <kemet-modal id="modal-new-quote" rounded effect="fadein-scaleup" .opened=${newQuoteOpened} @kemet-modal-closed=${() => modalsStore.setState({ newQuoteOpened: false })}>
