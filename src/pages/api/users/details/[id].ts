@@ -96,8 +96,12 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     delete body.filepond;
 
-    // Debug: Check what the current user's auth.uid() is
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get auth token from request headers
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.replace('Bearer ', '');
+
+    // Debug: Check what's current user's auth.uid() is
+    const { data: { user } } = await supabase.auth.getUser(token);
     console.log('Auth user UUID:', user?.id);
     console.log('Updating profile ID:', userId);
 
