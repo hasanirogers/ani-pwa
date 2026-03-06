@@ -19,6 +19,13 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
     // Use the server client with cookies
     const supabase = supabaseServerClient(cookies);
 
+    // Set auth context if we have an access token
+    const accessToken = cookies.get(`sb-${import.meta.env.PUBLIC_SUPABASE_PROJECT_ID}-auth-token`)?.value;
+    const refreshToken = cookies.get(`sb-${import.meta.env.PUBLIC_SUPABASE_PROJECT_ID}-auth-token-refresh`)?.value;
+    if (accessToken) {
+      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken || '' });
+    }
+
     const { data, error } = await supabase
       .from('Quotes')
       .insert({
