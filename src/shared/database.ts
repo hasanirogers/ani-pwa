@@ -20,26 +20,49 @@ export const supabaseAdmin = createClient(`https://${projectID}.supabase.co`, su
 
 
 export const supabaseServerClient = (cookies: AstroCookies) => {
-  return createServerClient(
+  const projectID = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
+  const supabaseKey = import.meta.env.SUPABASE_API_KEY_PUBLISHABLE;
+
+  // Get auth tokens from cookies
+  const accessToken = cookies.get(`sb-${projectID}-auth-token`)?.value;
+  const refreshToken = cookies.get(`sb-${projectID}-auth-token-refresh`)?.value;
+
+  const client = createServerClient(
     `https://${projectID}.supabase.co`,
     supabaseKey,
     {
       cookies: {
         get: (key) => cookies.get(key)?.value,
-        set: (key, value, options) => cookies.set(key, value, options),
-        remove: (key, options) => cookies.delete(key, options),
+        set: (key, value, options) => {
+          // Don't set cookies from server client to avoid conflicts
+          // We'll let the auth callback handle cookie setting
+        },
+        remove: (key, options) => {
+          // Don't remove cookies from server client to avoid conflicts
+        },
       },
       auth: {
-        persistSession: false, // Don't persist session on server side
-        autoRefreshToken: false, // Don't auto refresh on server side
+        persistSession: false,
+        autoRefreshToken: false,
         detectSessionInUrl: false,
       },
       global: {
-        headers: {
-          // Don't let Supabase client automatically handle auth
-          // We'll handle it manually in middleware
-        },
+        headers: accessToken ? {
+          Authorization: `Bearer ${accessToken}`
+        } : {}
       },
     }
   );
+
+  // Manually set session if we have tokens
+  if (accessToken) {
+    client.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken || ''
+    }).catch(() => {
+      // Ignore session setting errors to avoid breaking the client
+    });
+  }
+
+  return client;
 }
