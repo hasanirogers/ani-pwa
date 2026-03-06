@@ -24,17 +24,28 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
 
         if (profile) {
           locals.profile = profile;
+          // Include both UUID and integer ID in user object
+          locals.user = {
+            id: profile.id, // Use integer ID from profile for database operations
+            uuid: payload.sub, // Keep UUID for auth reference
+            email: payload.email,
+            aud: payload.aud || 'authenticated',
+            created_at: payload.created_at || new Date().toISOString(),
+            user_metadata: payload.user_metadata || {},
+            app_metadata: payload.app_metadata || {},
+          };
+        } else {
+          // Fallback if no profile found
+          locals.user = {
+            id: payload.sub, // UUID fallback
+            uuid: payload.sub,
+            email: payload.email,
+            aud: payload.aud || 'authenticated',
+            created_at: payload.created_at || new Date().toISOString(),
+            user_metadata: payload.user_metadata || {},
+            app_metadata: payload.app_metadata || {},
+          };
         }
-
-        // Create a minimal user object
-        locals.user = {
-          id: payload.sub,
-          email: payload.email,
-          aud: payload.aud || 'authenticated',
-          created_at: payload.created_at || new Date().toISOString(),
-          user_metadata: payload.user_metadata || {},
-          app_metadata: payload.app_metadata || {},
-        };
     } catch (decodeError) {
       console.error('Token decode error:', decodeError);
       // Token decoding failed, user remains undefined
