@@ -16,14 +16,14 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
       );
     }
 
-    // Create server client with cookies
+    // Use the server client with cookies
     const supabase = supabaseServerClient(cookies);
 
     const { data, error } = await supabase
       .from('Quotes')
       .insert({
         ...body,
-        user_id: locals.user.id, // Add user_id from authenticated user
+        user_id: locals.profile?.id || locals.user.id, // Use profile.id (integer) if available, fallback to user.id
       })
       .select('*')
       .single();
