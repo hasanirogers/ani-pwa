@@ -4,9 +4,17 @@ import { supabase } from "../../../shared/database";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const body = await request.json();
+
+    // Check if user is authenticated via middleware
+    if (!locals.user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "You are not logged in." }),
+        { status: 401 }
+      );
+    }
 
     const { data, error } = await supabase
       .from('Quotes')
