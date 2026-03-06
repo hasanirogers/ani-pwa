@@ -69,6 +69,29 @@ export default class AniFeed extends LitElement {
   }
 
   async updated(changedProperties: Map<string, unknown>) {
+    // If the search query changed in the store (via the subscription)
+    if (changedProperties.has('quoteState')) {
+      const oldState = changedProperties.get('quoteState') as IQuoteStore;
+
+      // Check if the search string specifically changed
+      if (this.quoteState.searchQuery !== oldState?.searchQuery) {
+        this.currentPage = 1; // RESET to page 1 for new searches
+
+        // If we are searching, we usually want to clear the previous
+        // results so the user sees the loader immediately
+        quoteStore.getState().clearQuotes(this.feed || 'all');
+
+        this.getQuotes();
+      }
+    }
+
+    // Handle Tab Changes
+    if (changedProperties.has('feed')) {
+      this.currentPage = 1;
+      quoteStore.getState().clearQuotes(this.feed || 'all');
+      this.getQuotes();
+    }
+
     if (changedProperties.has('feed')) {
       this.currentPage = 1;
       quoteStore.getState().clearQuotes(this.feed || 'all');
@@ -93,13 +116,11 @@ export default class AniFeed extends LitElement {
       const entry = entries[0];
       const feedKey = this.feed || 'all';
 
-      // Debug: Console log this to see why it might be failing
       const pagination = this.pagination[feedKey];
       const currentPage = Number(pagination?.page) || 1;
       const pageCount = Number(pagination?.pageCount) || 1;
 
       if (entry.isIntersecting && !this.isLoading && currentPage < pageCount) {
-        console.log('Sentinel triggered! Loading page:', currentPage + 1);
         this.currentPage = currentPage + 1;
         this.getQuotes(true);
       }
@@ -125,7 +146,8 @@ export default class AniFeed extends LitElement {
 
   try {
     const quotesPerPage = '4';
-    const searchParams = this.searchQuery ? `&search=${this.searchQuery}` : '';
+    const currentSearch = this.quoteState.searchQuery;
+    const searchParams = currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : '';
 
     // 2. Fetch data using the dynamic feedKey
     const response = await fetch(
@@ -199,14 +221,7 @@ export default class AniFeed extends LitElement {
 
   private renderEmptyMessage() {
     const feedKey = this.feed || 'all';
-
-    // If a search is active, show a specific search empty message
-    if (this.searchQuery) {
-      return html`
-        <p class="empty-msg">
-          We couldn't find any quotes matching "<strong>${this.searchQuery}</strong>".
-        </p>`;
-    }
+    const searchQuery = quoteStore.getState().searchQuery;
 
     // Map your feed keys to specific empty state templates
     const messages: Record<string, any> = {
@@ -216,6 +231,6 @@ export default class AniFeed extends LitElement {
       all: html`Wow, it's awfully silent in here. Be the first to post!`,
     };
 
-    return html`<p class="empty-msg">${messages[feedKey] || messages.all}</p>`;
+    return html`<p>${messages[feedKey] || messages.all}${searchQuery ? ` Try removing your search for better results as well.` : ''}</p>`;
   }
 }
