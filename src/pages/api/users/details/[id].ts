@@ -89,32 +89,26 @@ export const GET: APIRoute = async ({ params }) => {
   }
 }
 
-export const PUT: APIRoute = async ({ params, request, cookies }) => {
+export const PUT: APIRoute = async ({ params, request, locals }) => {
   try {
     const userId = Number(params.id);
     const body = await request.json();
 
     delete body.filepond;
 
-    // Use server client with cookies for proper RLS evaluation
-    const supabaseWithAuth = supabaseServerClient(cookies);
+    // Check if user is authenticated via middleware
+    if (!locals.user) {
+      return new Response(
+        JSON.stringify({ success: false, message: "You are not logged in." }),
+        { status: 401 }
+      );
+    }
 
-    // Debug: Check what's current user's auth.uid() is
-    const { data: { user } } = await supabaseWithAuth.auth.getUser();
-    console.log('Auth user UUID:', user?.id);
+    console.log('Auth user UUID from locals:', locals.user.id);
     console.log('Updating profile ID:', userId);
 
-    // Debug: Check the profile we're trying to update
-    const { data: profileCheck, error: checkError } = await supabaseWithAuth
-      .from('Profiles')
-      .select('id, uuid')
-      .eq('id', userId)
-      .single();
-
-    console.log('Profile check:', profileCheck);
-    console.log('Check error:', checkError);
-
-    const { error: updateError } = await supabaseWithAuth
+    // Use admin client to bypass RLS for profile updates
+    const { error: updateError } = await supabaseAdmin
       .from('Profiles')
       .update(body)
       .eq('id', userId)
