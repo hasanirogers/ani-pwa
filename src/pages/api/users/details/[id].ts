@@ -96,6 +96,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
     delete body.filepond;
 
+    // Debug: Check what the current user's auth.uid() is
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('Auth user UUID:', user?.id);
+    console.log('Updating profile ID:', userId);
+
+    // Debug: Check the profile we're trying to update
+    const { data: profileCheck, error: checkError } = await supabase
+      .from('Profiles')
+      .select('id, uuid')
+      .eq('id', userId)
+      .single();
+
+    console.log('Profile check:', profileCheck);
+    console.log('Check error:', checkError);
+
     const { error: updateError } = await supabase
       .from('Profiles')
       .update(body)
