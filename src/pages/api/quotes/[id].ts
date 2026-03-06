@@ -110,14 +110,17 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
   }
 
   try {
+    console.log('Attempting to delete quote with ID:', quote_id);
     const { data: deletedQuote, error } = await supabase
       .from('Quotes')
       .delete()
       .eq('id', quote_id)
       .select();
 
+    console.log('Delete result - deletedQuote:', deletedQuote, 'error:', error);
+
     if (error || !deletedQuote || deletedQuote.length === 0) {
-      console.log(error);
+      console.log('Delete failed or no records found');
       return new Response(
         JSON.stringify({ success: false, message: "Failed to delete quote.", error }),
         { status: 500 }
