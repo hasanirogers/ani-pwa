@@ -1,9 +1,10 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
+import { supabaseServerClient } from "../../../shared/database";
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request, locals, cookies }) => {
   try {
     const body = await request.json();
 
@@ -15,7 +16,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    const { data, error } = await locals.supabase
+    const { data, error } = await supabaseServerClient(cookies)
       .from('Quotes')
       .insert(body)
       .select('*')
