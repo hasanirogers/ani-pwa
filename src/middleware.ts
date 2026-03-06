@@ -6,20 +6,13 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
   const accessToken = cookies.get(`sb-${projectName}-auth-token`)?.value;
   const refreshToken = cookies.get(`sb-${projectName}-auth-token-refresh`)?.value;
 
-  console.log('Auth token found:', !!accessToken);
-  console.log('Refresh token found:', !!refreshToken);
-  console.log('Project name:', projectName);
-  console.log('Looking for cookie:', `sb-${projectName}-auth-token`);
-
   // Don't create Supabase client in middleware to avoid conflicts
   // We'll create it in individual API routes as needed
 
   if (accessToken) {
       try {
-        console.log('Processing access token...');
         // Decode JWT payload (base64)
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
-        console.log('JWT payload:', payload);
 
         // Try to get profile from cookie first, fallback to database
         const profileCookie = cookies.get('user-profile')?.value;
@@ -28,7 +21,6 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
         if (profileCookie) {
           try {
             profile = JSON.parse(profileCookie);
-            console.log('Profile from cookie:', profile);
           } catch (e) {
             console.error('Error parsing profile cookie:', e);
           }
@@ -47,8 +39,6 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
           user_metadata: payload.user_metadata || {},
           app_metadata: payload.app_metadata || {},
         };
-
-        console.log('User object set:', locals.user);
     } catch (decodeError) {
       console.error('Token decode error:', decodeError);
       // Token decoding failed, user remains undefined

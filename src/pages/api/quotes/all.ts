@@ -22,17 +22,15 @@ export const GET: APIRoute = async ({ request }) => {
     // total pages
     const pageCount = Math.ceil((count ?? 0) / pageSize);
 
-    const { data: quotes, error } = await supabase
-      .from('Quotes')
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quotes_and_books')
       .select(`
         *,
-        book:Books(id, title, identifier, authors),
         user:Profiles(*)
       `)
-      .limit(pageSize)
-      .range(from, to)
+      .or(`quote.ilike.%${search}%,book_title.ilike.%${search}%,book_authors.ilike.%${search}%,book_identifier.ilike.%${search}%`)
       .order('created_at', { ascending: false })
-      .or(`quote.ilike.%${search}%`);
+      .range(from, to);
 
     if (quotes) {
       const { data: { publicUrl } } = supabase
@@ -62,7 +60,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     return new Response(
-      JSON.stringify({ success: false, message: "Failed to get quotes.", error }),
+      JSON.stringify({ success: false, message: "Failed to get quotes.", quotesError }),
       { status: 400 }
     );
   } catch(error) {

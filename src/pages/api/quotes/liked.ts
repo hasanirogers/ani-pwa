@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const pageCount = Math.ceil((count ?? 0) / pageSize);
 
     let query = supabase
-      .from('Quotes')
+      .from('quotes_and_books')
       .select(`
         *,
         book:Books(id, title, identifier, authors),
@@ -42,7 +42,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
       .contains('likes', JSON.stringify([locals.profile.id]));
 
     if (search) {
-      query = query.ilike('quote', `%${search}%`);
+      // Use the .or() filter to check multiple columns at once
+      query = query.or(`quote.ilike.%${search}%,book_title.ilike.%${search}%,book_authors.ilike.%${search}%`);
     }
 
     const { data: quotes, error } = await query;
