@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabase } from "../../../shared/database";
+import { supabase, supabaseAdmin } from "../../../shared/database";
 import { determineAvatar } from "../../../shared/utilities";
 
 export const prerender = false;
@@ -148,7 +148,7 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const { data: deletedQuote, error } = await supabase
+    const { data: deletedQuote, error } = await supabaseAdmin
       .from('Quotes')
       .delete()
       .eq('id', quote_id)
