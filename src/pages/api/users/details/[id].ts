@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabase } from "../../../../shared/database";
+import { supabase, supabaseAdmin, supabaseServerClient } from "../../../../shared/database";
 import { determineAvatar } from "../../../../shared/utilities";
 
 export const prerender = false;
@@ -89,26 +89,23 @@ export const GET: APIRoute = async ({ params }) => {
   }
 }
 
-export const PUT: APIRoute = async ({ params, request }) => {
+export const PUT: APIRoute = async ({ params, request, cookies }) => {
   try {
     const userId = Number(params.id);
     const body = await request.json();
 
     delete body.filepond;
 
-    // Get auth token from cookies
-    const cookies = request.headers.get('cookie') || '';
-    const tokenMatch = cookies.match(/sb-[^-]+-auth-token=([^;]+)/);
-    const token = tokenMatch ? tokenMatch[1] : null;
-    console.log('Extracted token from cookies:', token ? 'found' : 'not found');
+    // Use server client with cookies for proper RLS evaluation
+    const supabaseWithAuth = supabaseServerClient(cookies);
 
     // Debug: Check what's current user's auth.uid() is
-    const { data: { user } } = await supabase.auth.getUser(token || undefined);
+    const { data: { user } } = await supabaseWithAuth.auth.getUser();
     console.log('Auth user UUID:', user?.id);
     console.log('Updating profile ID:', userId);
 
     // Debug: Check the profile we're trying to update
-    const { data: profileCheck, error: checkError } = await supabase
+    const { data: profileCheck, error: checkError } = await supabaseWithAuth
       .from('Profiles')
       .select('id, uuid')
       .eq('id', userId)
@@ -117,7 +114,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
     console.log('Profile check:', profileCheck);
     console.log('Check error:', checkError);
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseWithAuth
       .from('Profiles')
       .update(body)
       .eq('id', userId)
