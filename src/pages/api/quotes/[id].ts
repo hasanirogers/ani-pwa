@@ -110,12 +110,13 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
   }
 
   try {
-    const { data, error } = await supabase
-    .from('Quotes')
-    .delete()
-    .eq('id', quote_id);
+    const { data: deletedQuote, error } = await supabase
+      .from('Quotes')
+      .delete()
+      .eq('id', quote_id)
+      .select();
 
-    if (error) {
+    if (error || !deletedQuote || deletedQuote.length === 0) {
       console.log(error);
       return new Response(
         JSON.stringify({ success: false, message: "Failed to delete quote.", error }),
@@ -155,7 +156,7 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Quote deleted successfully.', data }),
+      JSON.stringify({ success: true, message: 'Quote deleted successfully.', data: deletedQuote }),
       { status: 200 } as any
     );
   } catch(error) {
