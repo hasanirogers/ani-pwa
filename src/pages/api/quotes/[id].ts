@@ -152,6 +152,7 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
       .from('Quotes')
       .delete()
       .eq('id', quote_id)
+      .eq('user_id', locals.profile.id) // Add explicit user_id filter for RLS
       .select();
 
     console.log('Delete result - deletedQuote:', deletedQuote, 'error:', error);
