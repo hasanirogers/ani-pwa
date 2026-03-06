@@ -5,27 +5,9 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
   // Check for auth cookies first before creating Supabase client
   const projectName = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
   const accessToken = cookies.get(`sb-${projectName}-auth-token`)?.value;
-  const supabaseKey = import.meta.env.SUPABASE_API_KEY_PUBLISHABLE;
 
   console.log('Auth token found:', !!accessToken);
 
-  // Create Supabase client with auth context
-  locals.supabase = createServerClient(
-    `https://${projectName}.supabase.co`,
-    supabaseKey,
-    {
-      cookies: {
-        get: (key) => cookies.get(key)?.value,
-        set: (key, value, options) => cookies.set(key, value, options),
-        remove: (key, options) => cookies.delete(key, options),
-      },
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-      },
-    }
-  );
 
   if (accessToken) {
       try {
