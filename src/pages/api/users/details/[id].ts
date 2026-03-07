@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ params }) => {
     const { data: books, error: booksError } = await supabase
       .from('Books')
       .select('*')
-      .in('id', profile.book_ids);
+      .in('id', profile.book_ids || []);
 
     if (booksError ) {
       console.error({ errors: { booksError } });
@@ -92,8 +92,8 @@ export const GET: APIRoute = async ({ params }) => {
 
     const data = {
       ...profile,
-      books,
-      counts: { quotes: quotesCount, followers: followerCount, following: profile.following?.length || 0 },
+      books: books || [],
+      counts: { quotes: quotesCount || 0, followers: followerCount, following: profile.following?.length || 0 },
       avatar: !!profile.avatar ? publicUrl : profile.avatar_url || null
     };
 
