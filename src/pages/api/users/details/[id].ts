@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
 import { supabase, supabaseAdmin } from "../../../../shared/database";
-import { determineAvatar } from "../../../../shared/utilities";
 
 export const prerender = false;
 
@@ -16,7 +15,7 @@ export const GET: APIRoute = async ({ params }) => {
       .single();
 
     if (profileError ) {
-      console.log({ errors: { profileError } });
+      console.error({ errors: { profileError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: profileError }),
         { status: 500 }
@@ -29,7 +28,7 @@ export const GET: APIRoute = async ({ params }) => {
       .in('id', profile.book_ids);
 
     if (booksError ) {
-      console.log({ errors: { booksError } });
+      console.error({ errors: { booksError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: booksError }),
         { status: 500 }
@@ -42,7 +41,7 @@ export const GET: APIRoute = async ({ params }) => {
       .eq('user_id', userId);
 
     if (quotesError ) {
-      console.log({ errors: { quotesError } });
+      console.error({ errors: { quotesError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: quotesError }),
       { status: 500 }
@@ -55,7 +54,7 @@ export const GET: APIRoute = async ({ params }) => {
       .filter('following', 'cs', userId);
 
     if (followersError ) {
-      console.log({ errors: { followersError } });
+      console.error({ errors: { followersError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: followersError }),
       { status: 500 }
