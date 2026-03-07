@@ -90,6 +90,23 @@ export const informationStyles = css`
     width: 100%;
   }
 
+  .profile-url {
+    img {
+      max-width: 80px;
+      border-radius: 50%;
+    }
+
+    & > div {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    kemet-field {
+      flex: 1;
+    }
+  }
+
   .actions {
     display: flex;
     gap: 1rem;

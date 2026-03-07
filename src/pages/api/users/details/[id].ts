@@ -64,17 +64,18 @@ export const GET: APIRoute = async ({ params }) => {
 
     const followerCount = followers?.length ?? 0;
 
-    const { data: { publicUrl } } = supabase
-      .storage
-      .from('avatars')
-      .getPublicUrl(profile.avatar || '');
+    const { data: { publicUrl } } = profile.avatar
+      ? supabase
+          .storage
+          .from('avatars')
+          .getPublicUrl(profile.avatar)
+      : { data: { publicUrl: null } };
 
     const data = {
       ...profile,
       books,
       counts: { quotes: quotesCount, followers: followerCount, following: profile.following?.length || 0 },
-      // avatar: profile.avatar ? publicUrl : null
-      avatar: determineAvatar(publicUrl, profile.avatar, profile.avatar_url)
+      avatar: !!profile.avatar ? publicUrl : profile.avatar_url || null
     };
 
     return new Response(
