@@ -108,10 +108,13 @@ export default class AniInformation extends LitElement {
                   </kemet-tooltip>
                 </div>
                 <div class="profile-image">${this.makeProfileImage()}</div>
-                <div>
-                  <kemet-field label="Profile Picture URL" slug="avatar_url">
-                    <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
-                  </kemet-field>
+                <div class="profile-url">
+                  <div>
+                    ${!!this.userState?.profile?.avatar_url ? html`<img src=${this.userState.profile.avatar_url} alt="Profile Picture" />` : ''}
+                    <kemet-field label="Profile Picture URL" slug="avatar_url">
+                      <kemet-input slot="input" name="avatar_url" rounded filled value=${this.userState?.profile?.avatar_url}></kemet-input>
+                    </kemet-field>
+                  </div>
                   <kemet-tooltip strategy="absolute" distance="30">
                     <kemet-icon icon="info-circle-fill" slot="trigger" aria-label="Information"></kemet-icon>
                     <div slot="content">Enter a url here that you want to use as a profile picture. If you upload a photo as well we'll use that picture instead.</div>

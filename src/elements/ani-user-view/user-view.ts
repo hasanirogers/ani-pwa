@@ -4,7 +4,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import Autolinker from 'autolinker';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
-import { type IBook, type IQuote, type IProfile } from '../../shared/interfaces';
+import { type IBook, type IQuote } from '../../shared/interfaces';
 import userStore, { type IUserStore } from '../../store/user';
 import sharedStyles from '../../shared/styles';
 import styles from './styles';
@@ -47,7 +47,6 @@ export default class AniUserView extends LitElement {
   render() {
     const user = this.user ? JSON.parse(this.user) : null;
     const displayName = this.user ? user.display_name ?? user.email : null;
-
     return html`
       <hr />
       ${user ?
@@ -115,7 +114,7 @@ export default class AniUserView extends LitElement {
     this.followers = this.follow ? this.followers - 1 : this.followers + 1;
     this.follow = !this.follow;
 
-    await fetch(`/api/follow/${this.userState.profile.id}`, {
+    await fetch(`/api/follow/${this.userState.profile?.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
