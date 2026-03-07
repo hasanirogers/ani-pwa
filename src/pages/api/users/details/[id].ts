@@ -18,7 +18,12 @@ export const GET: APIRoute = async ({ params }) => {
       console.error({ errors: { profileError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: profileError }),
-        { status: 500 }
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
@@ -31,7 +36,12 @@ export const GET: APIRoute = async ({ params }) => {
       console.error({ errors: { booksError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: booksError }),
-        { status: 500 }
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
@@ -44,7 +54,12 @@ export const GET: APIRoute = async ({ params }) => {
       console.error({ errors: { quotesError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: quotesError }),
-      { status: 500 }
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
@@ -57,7 +72,12 @@ export const GET: APIRoute = async ({ params }) => {
       console.error({ errors: { followersError } });
       return new Response(
         JSON.stringify({ success: false, message: "Failed to get profile.", error: followersError }),
-      { status: 500 }
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
@@ -79,13 +99,23 @@ export const GET: APIRoute = async ({ params }) => {
 
     return new Response(
       JSON.stringify(data),
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     );
   } catch (error) {
     console.log(error);
     return new Response(
       JSON.stringify({ success: false, message: "An internal server error occurred." }),
-      { status: 500 })
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
   }
 }
 
@@ -100,7 +130,12 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     if (!locals.user) {
       return new Response(
         JSON.stringify({ success: false, message: "You are not logged in." }),
-        { status: 401 }
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
@@ -115,7 +150,12 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
       console.error(updateError);
       return new Response(
         JSON.stringify({ success: false, message: "Failed to update profile.", error: updateError }),
-        { status: 400 }
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
     }
 
@@ -127,13 +167,23 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
 
     return new Response(
       JSON.stringify({ success: true, message: "Profile updated successfully.", data }),
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     );
   } catch (error) {
     console.log(error);
     return new Response(
       JSON.stringify({ success: false, message: "An internal server error occurred."}),
-      { status: 500 })
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
   }
 }
 
