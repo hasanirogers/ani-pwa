@@ -92,12 +92,6 @@ export default class AniFeed extends LitElement {
       this.getQuotes();
     }
 
-    if (changedProperties.has('feed')) {
-      this.currentPage = 1;
-      quoteStore.getState().clearQuotes(this.feed || 'all');
-      this.getQuotes();
-    }
-
     if (changedProperties.has('searchQuery') && this.searchQuery) {
       this.getQuotes();
     }
@@ -110,84 +104,6 @@ export default class AniFeed extends LitElement {
       this.observer.observe(this.sentinel);
     }
   }
-
-  setupObserver() {
-    this.observer = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      const feedKey = this.feed || 'all';
-
-      const pagination = this.pagination[feedKey];
-      const currentPage = Number(pagination?.page) || 1;
-      const pageCount = Number(pagination?.pageCount) || 1;
-
-      if (entry.isIntersecting && !this.isLoading && currentPage < pageCount) {
-        this.currentPage = currentPage + 1;
-        this.getQuotes(true);
-      }
-    }, {
-      rootMargin: '400px', // Increased margin so it loads BEFORE the user hits the bottom
-      threshold: 0.1
-    });
-  }
-
-  async getQuotes(isPagination = false) {
-  const feedKey = this.feed;
-  if (!feedKey) return;
-
-  // 1. Prevent Race Conditions
-  // If a request is already in flight for this specific feed, abort it
-  // before starting a new one (e.g., user clicked "All" then "Mine" quickly)
-  if (this.abortController) {
-    this.abortController.abort();
-  }
-  this.abortController = new AbortController();
-
-  this.isLoading = true;
-
-  try {
-    const quotesPerPage = '4';
-    const currentSearch = this.quoteState.searchQuery;
-    const searchParams = currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : '';
-
-    // 2. Fetch data using the dynamic feedKey
-    const response = await fetch(
-      `/api/quotes/${feedKey}?page=${this.currentPage}&pageSize=${quotesPerPage}${searchParams}`,
-      { signal: this.abortController.signal }
-    );
-
-    if (!response.ok) throw new Error('Network response was not ok');
-
-    const quotesResponse = await response.json();
-
-    // 3. Update Pagination State
-    // We use the spread operator to ensure Lit detects the object change
-    this.pagination = {
-      ...this.pagination,
-      [feedKey]: quotesResponse.meta.pagination
-    };
-
-    // 4. Update the Zustand Store bucket
-    // If it's pagination, we append. If it's the first load, we replace.
-    if (isPagination) {
-      quoteStore.getState().addQuotes(feedKey, quotesResponse.quotes);
-    } else {
-      quoteStore.getState().addInitialQuotes(feedKey, quotesResponse.quotes);
-    }
-
-    // 5. Mark as loaded for the UI empty-state logic
-    this.hasLoaded = {
-      ...this.hasLoaded,
-      [feedKey]: true
-    };
-
-  } catch (error: any) {
-    // If the error is an Abort, it's intentional, so we ignore it.
-    if (error.name === 'AbortError') return;
-    console.error(`Error fetching quotes for ${feedKey}:`, error);
-  } finally {
-    this.isLoading = false;
-  }
-}
 
   render() {
     const feedKey = this.feed || 'all';
@@ -217,6 +133,84 @@ export default class AniFeed extends LitElement {
 
     // Priority 3: Show the initial loader
     return html`<p><ani-loader loading></ani-loader></p>`;
+  }
+
+  setupObserver() {
+    this.observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      const feedKey = this.feed || 'all';
+
+      const pagination = this.pagination[feedKey];
+      const currentPage = Number(pagination?.page) || 1;
+      const pageCount = Number(pagination?.pageCount) || 1;
+
+      if (entry.isIntersecting && !this.isLoading && currentPage < pageCount) {
+        this.currentPage = currentPage + 1;
+        this.getQuotes(true);
+      }
+    }, {
+      rootMargin: '400px', // Increased margin so it loads BEFORE the user hits the bottom
+      threshold: 0.1
+    });
+  }
+
+  async getQuotes(isPagination = false) {
+    const feedKey = this.feed;
+    if (!feedKey) return;
+
+    // 1. Prevent Race Conditions
+    // If a request is already in flight for this specific feed, abort it
+    // before starting a new one (e.g., user clicked "All" then "Mine" quickly)
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    this.abortController = new AbortController();
+
+    this.isLoading = true;
+
+    try {
+      const quotesPerPage = '4';
+      const currentSearch = this.quoteState.searchQuery;
+      const searchParams = currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : '';
+
+      // 2. Fetch data using the dynamic feedKey
+      const response = await fetch(
+        `/api/quotes/${feedKey}?page=${this.currentPage}&pageSize=${quotesPerPage}${searchParams}`,
+        { signal: this.abortController.signal }
+      );
+
+      if (!response.ok) throw new Error('Network response was not ok');
+
+      const quotesResponse = await response.json();
+
+      // 3. Update Pagination State
+      // We use the spread operator to ensure Lit detects the object change
+      this.pagination = {
+        ...this.pagination,
+        [feedKey]: quotesResponse.meta.pagination
+      };
+
+      // 4. Update the Zustand Store bucket
+      // If it's pagination, we append. If it's the first load, we replace.
+      if (isPagination) {
+        quoteStore.getState().addQuotes(feedKey, quotesResponse.quotes);
+      } else {
+        quoteStore.getState().addInitialQuotes(feedKey, quotesResponse.quotes);
+      }
+
+      // 5. Mark as loaded for the UI empty-state logic
+      this.hasLoaded = {
+        ...this.hasLoaded,
+        [feedKey]: true
+      };
+
+    } catch (error: any) {
+      // If the error is an Abort, it's intentional, so we ignore it.
+      if (error.name === 'AbortError') return;
+      console.error(`Error fetching quotes for ${feedKey}:`, error);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   private renderEmptyMessage() {

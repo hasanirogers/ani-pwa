@@ -13,35 +13,50 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, request }, n
       try {
         // Decode JWT payload (base64)
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        const now = Math.floor(Date.now() / 1000);
 
-        // Try to get profile from cookie first, fallback to database
-        const profileCookie = cookies.get('user-profile')?.value;
-        let profile = null;
+        // Check if token is expired
+        if (payload.exp && payload.exp >= now) {
+          // Token is valid, proceed with user setup
 
-        if (profileCookie) {
-          try {
-            profile = JSON.parse(profileCookie);
-          } catch (e) {
-            console.error('Error parsing profile cookie:', e);
+          // Try to get profile from cookie first, fallback to database
+          const profileCookie = cookies.get('user-profile')?.value;
+          let profile = null;
+
+          if (profileCookie) {
+            try {
+              profile = JSON.parse(profileCookie);
+            } catch (e) {
+              console.error('Error parsing profile cookie:', e);
+            }
           }
-        }
 
-        if (profile) {
-          locals.profile = profile;
-        }
+          if (profile) {
+            locals.profile = profile;
+          }
 
-        // Create a minimal user object
-        locals.user = {
-          id: payload.sub,
-          email: payload.email,
-          aud: payload.aud || 'authenticated',
-          created_at: payload.created_at || new Date().toISOString(),
-          user_metadata: payload.user_metadata || {},
-          app_metadata: payload.app_metadata || {},
-        };
+          // Create a minimal user object
+          locals.user = {
+            id: payload.sub,
+            email: payload.email,
+            aud: payload.aud || 'authenticated',
+            created_at: payload.created_at || new Date().toISOString(),
+            user_metadata: payload.user_metadata || {},
+            app_metadata: payload.app_metadata || {},
+          };
+        } else {
+          console.log('Token expired, clearing auth cookies');
+          // Clear expired tokens
+          cookies.delete(`sb-${projectName}-auth-token`, { path: '/' });
+          cookies.delete(`sb-${projectName}-auth-token-refresh`, { path: '/' });
+          cookies.delete('user-profile', { path: '/' });
+        }
     } catch (decodeError) {
       console.error('Token decode error:', decodeError);
-      // Token decoding failed, user remains undefined
+      // Clear invalid tokens
+      cookies.delete(`sb-${projectName}-auth-token`, { path: '/' });
+      cookies.delete(`sb-${projectName}-auth-token-refresh`, { path: '/' });
+      cookies.delete('user-profile', { path: '/' });
     }
   } else {
     console.log('No access token found');
