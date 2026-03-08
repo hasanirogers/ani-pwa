@@ -99,20 +99,20 @@ export default class AniNewQuote extends LitElement {
 
   async addQuote() {
     const formData = new FormData(this.quoteForm);
-    const userData = Object.fromEntries(formData);
+    const submittedData = Object.fromEntries(formData);
 
-    userData.book = this.userBook ? this.userBook.shadowRoot!.querySelector('select')?.value as string : '';
+    submittedData.book = this.userBook ? this.userBook.shadowRoot!.querySelector('select')?.value as string : '';
 
     const user = this.userState.profile;
 
     const payload = {
-      quote: userData.quote,
+      quote: submittedData.quote,
       requote: '',
       requotes: [],
       user_id: user?.id,
-      book_id: userData.book,
-      page: userData.page,
-      note: userData.note,
+      book_id: submittedData.book,
+      page: submittedData.page,
+      note: submittedData.note,
       private: false,
       likes: []
     }
@@ -135,7 +135,8 @@ export default class AniNewQuote extends LitElement {
     }
 
     this.modalsState.setNewQuoteOpened(false);
-    newData && this.quoteState.addQuote(newData);
+    newData && this.quoteState.addQuote('all', newData);
+    newData && this.quoteState.addQuote('mine', newData);
     newData && this.clearForm();
   }
 

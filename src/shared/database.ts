@@ -1,5 +1,4 @@
 import { createClient, type AuthFlowType } from "@supabase/supabase-js";
-import { createServerClient } from '@supabase/ssr';
 import type { AstroCookies } from 'astro';
 
 const projectID = import.meta.env.PUBLIC_SUPABASE_PROJECT_ID;
@@ -17,25 +16,95 @@ const options = {
 export const supabase = createClient(`https://${projectID}.supabase.co`, supabaseKey, options);
 export const supabaseAdmin = createClient(`https://${projectID}.supabase.co`, supabaseSecret);
 
-export const supabaseServerClient = (cookies: AstroCookies) => {
+export const supabaseServerClient = async (cookies: AstroCookies) => {
   // Get auth tokens from cookies
   const accessToken = cookies.get(`sb-${projectID}-auth-token`)?.value;
   const refreshToken = cookies.get(`sb-${projectID}-auth-token-refresh`)?.value;
 
-  const client = createServerClient(
+  // If no access token, return client without auth
+  if (!accessToken) {
+    return createClient(
+      `https://${projectID}.supabase.co`,
+      supabaseSecret,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        }
+      }
+    );
+  }
+
+  // Check if token is expired
+  try {
+    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+
+    // If token is expired and we have a refresh token, try to refresh
+    if (payload.exp && payload.exp < now && refreshToken) {
+      const tempClient = createClient(
+        `https://${projectID}.supabase.co`,
+        supabaseSecret,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          }
+        }
+      );
+
+      const { data, error } = await tempClient.auth.refreshSession({ refresh_token: refreshToken });
+
+      if (!error && data.session?.access_token) {
+        // Update the access token cookie
+        cookies.set(`sb-${projectID}-auth-token`, data.session.access_token, {
+          path: "/",
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax" as const,
+          maxAge: 604800,
+        });
+
+        // Update refresh token if provided
+        if (data.session.refresh_token) {
+          cookies.set(`sb-${projectID}-auth-token-refresh`, data.session.refresh_token, {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "lax" as const,
+            maxAge: 604800,
+          });
+        }
+
+        return createClient(
+          `https://${projectID}.supabase.co`,
+          supabaseSecret,
+          {
+            auth: {
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false,
+            },
+            global: {
+              headers: {
+                Authorization: `Bearer ${data.session.access_token}`
+              }
+            },
+          }
+        );
+      }
+    }
+  } catch (error) {
+    console.error('Error checking token expiration:', error);
+  }
+
+  // Use regular createClient with service role key
+  const client = createClient(
     `https://${projectID}.supabase.co`,
-    supabaseKey,
+    supabaseSecret,
     {
-      cookies: {
-        get: (key) => cookies.get(key)?.value,
-        set: (key, value, options) => {
-          // Don't set cookies from server client to avoid conflicts
-          // We'll let the auth callback handle cookie setting
-        },
-        remove: (key, options) => {
-          // Don't remove cookies from server client to avoid conflicts
-        },
-      },
       auth: {
         persistSession: false,
         autoRefreshToken: false,
@@ -48,16 +117,6 @@ export const supabaseServerClient = (cookies: AstroCookies) => {
       },
     }
   );
-
-  // Manually set session if we have tokens
-  if (accessToken) {
-    client.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken || ''
-    }).catch(() => {
-      // Ignore session setting errors to avoid breaking the client
-    });
-  }
 
   return client;
 }
