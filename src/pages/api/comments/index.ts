@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import 'dotenv/config'
-import { supabase } from "../../../shared/database";
+import { supabase, supabaseServerClient } from "../../../shared/database";
 
 export const prerender = false;
 
@@ -32,11 +32,20 @@ export const GET: APIRoute = async ({ request }) => {
   }
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies, locals }) => {
   const body = await request.json();
 
+  if (!locals.user) {
+    return new Response(
+      JSON.stringify({ success: false, message: "You are not logged in." }),
+      { status: 401 }
+    );
+  }
+
+  const supabaseServer = await supabaseServerClient(cookies);
+
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
     .from('Comments')
     .insert({
       quote_id: body.quote_id,
